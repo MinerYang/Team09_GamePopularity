@@ -11,9 +11,9 @@ In order to usefully apply knowledge of Scala and Big data to a problem with pra
 In our prediction system, we expect to predict the popularity of a new-release game for its developer and publisher according to its multiple tags, such as games genres. Popularity would be based on positive ratings, negative ratings and other features. This prediction result would benefit the business operation support system of a game company to evaluate their market better.
 
 > ## Dataset Inspection
-•	Source: https://www.kaggle.com/nikdavis/steam-store-games
-•	6 separated .csv files with roughly 30000 rows
-•	steamspy_tag_data.csv contains 371 columns related to game tags we ‘d like to use
+-	Source https://www.kaggle.com/nikdavis/steam-store-games
+-	6 separated .csv files with roughly 30000 rows
+-	steamspy_tag_data.csv contains 371 columns related to game tags we ‘d like to use
 
 
 
