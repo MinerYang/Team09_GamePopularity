@@ -12,6 +12,7 @@ Since when we do ML like KNN, it needs to be in a table format. Additionally, th
 > ### About ML
 Reference
 - [KNN](https://towardsdatascience.com/machine-learning-basics-with-the-k-nearest-neighbors-algorithm-6a6e71d01761)
+- [spark_KNNsample](https://github.com/saurfang/spark-knn)
 - [NickBear_DataScience](https://github.com/nikbearbrown/INFO_6105)
 - [NickBear_BigData](https://github.com/nikbearbrown/CSYE_7245)
 
