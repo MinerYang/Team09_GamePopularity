@@ -35,8 +35,8 @@ Reference
     - ~~upsupervised: learn a function that will allow us to make predictions given some new unlabeled data~~
 3. **which columns would be used to feature extraction and ML job**?
     - Maybe some correlation analisis sould be done
-    - **Mainly use table [steam.csv](https://www.kaggle.com/nikdavis/steam-store-games#steam.csv); 
-    - **Maybe join with [steam_review.csv](https://www.kaggle.com/luthfim/steam-reviews-dataset)
+    - **Mainly use table [steam.csv](https://www.kaggle.com/nikdavis/steam-store-games#steam.csv);** 
+    - **Maybe join with [steam_review.csv](https://www.kaggle.com/luthfim/steam-reviews-dataset)**
 4. Algorthim exploring in spark/scala(MLlib)
     - which model training algorithm we plan to use? It basically depends on either classification or regression 
     - And how to implenment it in spark/scala (some one should explore this ahead)
