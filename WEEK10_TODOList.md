@@ -5,7 +5,8 @@ Since when we do ML like KNN, it needs to be in a table format. Additionally, th
 [SteamStoreDataset](https://www.kaggle.com/nikdavis/steam-store-games#steam.csv)
 1. ~~Is **Ratings** == **Popularity** ?~~
 2. ~~If not, then how to calculate the popularity score? (should consider problems like how to validate the model accuracy in the future)~~
-==> 9 classes to define game popularity
+
+9 classes to define game popularity
     - **Overhwelmingly Positive**: (95%-99%)
     - **Very Positive**: (94%-80%)
     - **Positive**: (80%-99%)+few reviews 
@@ -28,16 +29,20 @@ Reference
 - [NickBear_DataScience](https://github.com/nikbearbrown/INFO_6105)
 - [NickBear_BigData](https://github.com/nikbearbrown/CSYE_7245)
 
-1. ~~**classification or regression** ?~~ ==> **classification**
+1. ~~**classification or regression** ?~~ 
+
+==> **classification**
     ~~- classification: discrete value as its output (in our case would be rating 1-5)
     ~~- regression :~~
-2. ~~supervised or unsupervised?~~ ==>**supervised
+2. ~~supervised or unsupervised?~~ 
+
+==>**supervised
     ~~- supervised: learn a function give a result of given labels
     ~~- upsupervised: learn a function that will allow us to make predictions given some new unlabeled data
 3. **which columns would be used to feature extraction and ML job**?
     - Maybe some correlation analisis sould be done
-    ==> **Mainly use table [steam.csv](https://www.kaggle.com/nikdavis/steam-store-games#steam.csv); 
-    ==> **Maybe join with [steam_review.csv](https://www.kaggle.com/luthfim/steam-reviews-dataset)
+    - **Mainly use table [steam.csv](https://www.kaggle.com/nikdavis/steam-store-games#steam.csv); 
+    - **Maybe join with [steam_review.csv](https://www.kaggle.com/luthfim/steam-reviews-dataset)
 4. Algorthim exploring in spark/scala(MLlib)
     - which model training algorithm we plan to use? It basically depends on either classification or regression 
     - And how to implenment it in spark/scala (some one should explore this ahead)
