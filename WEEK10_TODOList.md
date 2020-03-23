@@ -30,7 +30,7 @@ Reference
 1. **classification or regression** ? ==>**classification**
     - ~~classification: discrete value as its output (in our case would be rating 1-5)~~
     - ~~regression :~~
-2. supervised or unsupervised? ==>**supervised
+2. supervised or unsupervised? ==>**unsupervised**
     - ~~supervised: learn a function give a result of given labels~~
     - ~~upsupervised: learn a function that will allow us to make predictions given some new unlabeled data~~
 3. **which columns would be used to feature extraction and ML job**?
