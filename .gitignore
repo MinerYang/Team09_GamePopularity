@@ -1,9 +1,4 @@
 # Build and Release Folders
-*/project
-*/target
-project/
-target/
-out/
 
 # Other files and folders
 *.DS_Store
