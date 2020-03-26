@@ -1,4 +1,6 @@
 # Build and Release Folders
+*/project
+*/target
 
 # Other files and folders
 *.DS_Store
