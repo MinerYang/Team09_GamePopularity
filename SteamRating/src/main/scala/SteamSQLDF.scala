@@ -1,6 +1,6 @@
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-case object SteamDF {
+case object SteamSQLDF {
   var appName = "SteamDataCleansing"
   var master = "local[*]"
 

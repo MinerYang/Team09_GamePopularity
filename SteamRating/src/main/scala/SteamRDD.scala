@@ -1,7 +1,7 @@
 import org.apache.spark.SparkContext._
 import org.apache.spark.{SparkConf, SparkContext}
 
-case object DataRDD {
+case object SteamRDD {
   def main(args: Array[String]) {
     //linux files or sth like HDFS
     //edit configurations => program arguments: ./Steam.csv
