@@ -2,7 +2,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 case object SteamDF {
   var appName = "SteamDataCleansing"
-  var master = "spark://standalone.com:7077"
+  var master = "local[*]"
 
   def main(args: Array[String]) {
     val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
