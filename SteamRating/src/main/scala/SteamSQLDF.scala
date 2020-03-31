@@ -12,6 +12,15 @@ case object SteamSQLDF {
       .option("inferSchema", true.toString) //这是自动推断属性列的数据类型
       .load("Steam.csv")
 
-    df.show()
+//    df.show(5)
+
+    val pRatings = df("positive_ratings")
+    val nRatings = df("negative_ratings")
+    val total_ratings = pRatings + nRatings
+    val ratings = ((pRatings / total_ratings)*100).cast("int")
+    val df1 = df.withColumn("positive_ratings", ratings).withColumnRenamed("positive_ratings", "ratings")
+    val df2 = df1.drop("name", "release_date", "english", "achievements", "negative_ratings", "genres",
+      "required_age", "average_playtime", "median_playtime", "owners")
+    df2.show(5)
   }
 }
