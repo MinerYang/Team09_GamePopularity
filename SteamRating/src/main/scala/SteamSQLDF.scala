@@ -1,3 +1,4 @@
+import org.apache.spark.sql.functions.when
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 case object SteamSQLDF {
@@ -12,15 +13,22 @@ case object SteamSQLDF {
       .option("inferSchema", true.toString) //这是自动推断属性列的数据类型
       .load("Steam.csv")
 
-//    df.show(5)
+    //    df.show(5)
 
-    val pRatings = df("positive_ratings")
-    val nRatings = df("negative_ratings")
-    val total_ratings = pRatings + nRatings
-    val ratings = ((pRatings / total_ratings)*100).cast("int")
-    val df1 = df.withColumn("positive_ratings", ratings).withColumnRenamed("positive_ratings", "ratings")
-    val df2 = df1.drop("name", "release_date", "english", "achievements", "negative_ratings", "genres",
-      "required_age", "average_playtime", "median_playtime", "owners")
-    df2.show(5)
+    val total_ratings = df("positive_ratings") + df("negative_ratings")
+    val r = df("positive_ratings") / total_ratings
+
+    val rawTable = df.withColumn("positive_ratings", when(r >= 0.95, 5)
+      .when(r >= 0.8, 4)
+      .when(r >= 0.7, 3)
+      .when(r >= 0.4, 2)
+      .when(r >= 0.2, 1)
+      .otherwise(0))// ratings to categorical type
+      .withColumnRenamed("positive_ratings", "ratings")
+      .drop("name", "release_date", "english", "achievements", "negative_ratings", "genres",
+        "required_age", "average_playtime", "median_playtime", "owners")
+
+    rawTable.where("ratings = 0").show()
+
   }
 }
