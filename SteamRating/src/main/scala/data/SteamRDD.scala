@@ -1,4 +1,5 @@
-import org.apache.spark.SparkContext._
+package data
+
 import org.apache.spark.{SparkConf, SparkContext}
 
 case object SteamRDD {
