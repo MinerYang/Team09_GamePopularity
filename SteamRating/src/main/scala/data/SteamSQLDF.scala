@@ -34,9 +34,9 @@ case object SteamSQLDF {
       .drop("name", "release_date", "english", "achievements", "negative_ratings", "genres",
         "required_age", "average_playtime", "median_playtime", "owners")
 
-    rawTable.where("ratings = 0").show()
+//    rawTable.where("ratings = 0").show()
 
-//    val df1 = new PlatformETS().extract(rawTable, "platforms")
-//    df1.show()
+    val df1 = new PlatformETS().extract(rawTable, "platforms")
+    df1.show()
   }
 }
