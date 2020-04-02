@@ -8,7 +8,7 @@ trait ColumnFeatureETS {
   def extract(df: DataFrame, colName:String): DataFrame = {
     val cvModel: CountVectorizerModel = new CountVectorizer()
       .setInputCol(colName)
-      .setOutputCol(colName+"features")
+      .setOutputCol(colName+"_features")
       .setMinDF(2)
       .fit(df)
     cvModel.transform(df)
