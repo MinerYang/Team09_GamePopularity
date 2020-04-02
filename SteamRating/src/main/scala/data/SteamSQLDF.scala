@@ -8,7 +8,28 @@ case object SteamSQLDF {
   lazy val appName = "SteamDataCleansing"
   lazy val master = "local[*]"
 
+  def main(args: Array[String]) {
+    val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
+    ss.sparkContext.setLogLevel("WARN")
+    import ss.implicits._
+
+    val df: DataFrame = ss.read.format("com.databricks.spark.csv")
+      .option("header", "true") //在csv第一行有属性"true"，没有就是"false"
+      .option("inferSchema", true.toString) //这是自动推断属性列的数据类型
+      .load("Steam.csv")
+    //    df.show(5)
+
+    val rawTable = processRatings(getRawTable(df))
+    //    rawTable.where("ratings = 0").show()
+
+    val df1 = PlatformETS().extract(rawTable, "platforms")
+          .withColumn("platforms_features", sparseToDense($"platforms_features"))
+    //    df1.show()
+    val df2 = PlatformETS().chiSqSelect(df1, "platforms_features", "ratings", 2)
+  }
+
   def vecToArray = udf((v: Vector) => v.toArray)
+  def sparseToDense = udf((v: Vector) => v.toDense)
 
   def getRawTable(df: DataFrame): DataFrame = df.withColumn("platforms", split(df("platforms"), ";"))
     .withColumn("categories", split(df("categories"), ";"))
@@ -27,25 +48,6 @@ case object SteamSQLDF {
       .otherwise(0)) // ratings to categorical type
       .withColumnRenamed("positive_ratings", "ratings")
       .drop("negative_ratings")
-  }
-
-  def main(args: Array[String]) {
-    val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
-    import ss.implicits._
-
-    val df: DataFrame = ss.read.format("com.databricks.spark.csv")
-      .option("header", "true") //在csv第一行有属性"true"，没有就是"false"
-      .option("inferSchema", true.toString) //这是自动推断属性列的数据类型
-      .load("Steam.csv")
-    //    df.show(5)
-
-    val rawTable = processRatings(getRawTable(df))
-    //    rawTable.where("ratings = 0").show()
-
-    val df1 = new PlatformETS().extract(rawTable, "platforms")
-      .withColumn("platforms_features", vecToArray($"platforms_features"))
-
-    df1.show()
   }
 }
 
