@@ -22,14 +22,18 @@ case object SteamSQLDF {
     val rawTable = processRatings(getRawTable(df))
     //    rawTable.where("ratings = 0").show()
 
-    val df1 = PlatformETS().extract(rawTable, "platforms")
-          .withColumn("platforms_features", sparseToDense($"platforms_features"))
-    //    df1.show()
-    val df2 = PlatformETS().chiSqSelect(df1, "platforms_features", "ratings", 2)
+//    val df1 = PlatformETS().extract(rawTable, "platforms")
+//          .withColumn("platforms_features", sparseToDense($"platforms_features"))
+//    PlatformETS().chiSqSelect(df1, "platforms_features", "ratings", 2)
+
+    val df2 = categoriesETS().extract(rawTable, "categories")
+      .withColumn("categories_features", sparseToDense($"categories_features"))
+    categoriesETS().chiSqSelect(df2, "categories_features", "ratings", 50)
   }
 
   def vecToArray = udf((v: Vector) => v.toArray)
   def sparseToDense = udf((v: Vector) => v.toDense)
+  def denseToSparse = udf((v: Vector) => v.toSparse)
 
   def getRawTable(df: DataFrame): DataFrame = df.withColumn("platforms", split(df("platforms"), ";"))
     .withColumn("categories", split(df("categories"), ";"))

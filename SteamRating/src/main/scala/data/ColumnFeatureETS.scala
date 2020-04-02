@@ -36,3 +36,9 @@ case class PlatformETS() extends ColumnFeatureETS {
 
 case object PlatformETS {
 }
+
+case class categoriesETS() extends ColumnFeatureETS {
+}
+
+case object categoriesETS {
+}
