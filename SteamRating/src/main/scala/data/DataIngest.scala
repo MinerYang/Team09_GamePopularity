@@ -39,7 +39,13 @@ case object DataIngest{
     Vectors.dense(array.toArray.map(_.toDouble))
   })
 
-
+  /**
+   * using spark ChiSqSelector to select fixed number of features
+   * @param df
+   * @param NumTopFeatures
+   * @param featurCol
+   * @param labelCol
+   */
   def chiSqSelect(df: DataFrame, NumTopFeatures: Int, featurCol: String, labelCol: String): Unit = {
     val selector = new ChiSqSelector()
       .setNumTopFeatures(NumTopFeatures)
