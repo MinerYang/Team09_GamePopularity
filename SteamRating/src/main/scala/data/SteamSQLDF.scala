@@ -22,13 +22,21 @@ case object SteamSQLDF {
     val rawTable = processRatings(getRawTable(df))
     //    rawTable.where("ratings = 0").show()
 
-    val df1 = PlatformETS().extractAndSelect(rawTable, "platforms", "ratings", 3)
-      .withColumn("platforms_features", sparseToDense($"platforms_features"))
+    val dfprice = priceETS().extractAndSelectFpr(rawTable, "price", "ratings", 0.01)
+    dfprice.show()
 
-    val df2 = categoriesETS().extractAndSelect(df1, "categories", "ratings", 0.5)
-
-    val df3 = tagsETS().extractAndSelect(df2, "tags", "ratings", 50)
-    df3.show()
+//    val df1 = PlatformETS().extractAndSelectFpr(rawTable, "platforms", "ratings", 0.01)
+//      .withColumn("platforms_features", sparseToDense($"platforms_features"))
+//
+//    val df2 = categoriesETS().extractAndSelectFpr(df1, "categories", "ratings", 0.01)
+//
+//    val df3 = tagsETS().extractAndSelectFpr(df2, "tags", "ratings", 0.01)
+//
+//    val df4 = developerETS().extractAndSelectFpr(df3, "developer", target = "ratings", para = 0.01)
+//
+//    val df5 = publisherETS().extractAndSelectFpr(df4, "publisher", target = "ratings", para = 0.01)
+//
+//    df5.show()
   }
 
   def vecToArray = udf((v: Vector) => v.toArray)
@@ -37,7 +45,11 @@ case object SteamSQLDF {
 
   def denseToSparse = udf((v: Vector) => v.toSparse)
 
-  def getRawTable(df: DataFrame): DataFrame = df.withColumn("platforms", split(df("platforms"), ";"))
+  def getRawTable(df: DataFrame): DataFrame = df
+    .withColumn("price", split(df("price"), ";"))
+    .withColumn("developer", split(df("developer"), ";"))
+    .withColumn("publisher", split(df("publisher"), ";"))
+    .withColumn("platforms", split(df("platforms"), ";"))
     .withColumn("categories", split(df("categories"), ";"))
     .withColumn("steamspy_tags", split(df("steamspy_tags"), ";"))
     .withColumnRenamed("steamspy_tags", "tags")
@@ -45,6 +57,7 @@ case object SteamSQLDF {
       "required_age", "average_playtime", "median_playtime", "owners")
 
   def processRatings(df: DataFrame): DataFrame = {
+    //TODO: maybe total=0?
     val total_ratings = df("positive_ratings") + df("negative_ratings")
     val r = df("positive_ratings") / total_ratings
     df.withColumn("positive_ratings", when(r >= 0.95, 5)

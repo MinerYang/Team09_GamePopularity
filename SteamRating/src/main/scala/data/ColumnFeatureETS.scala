@@ -19,7 +19,7 @@ trait ColumnFeatureETS {
     cvModel
   }
 
-  def chiSqSelectorNum(cv: CountVectorizerModel, df: DataFrame, colName: String, target: String, para:Int): DataFrame = {
+  def chiSqSelectorNum(cv: CountVectorizerModel, df: DataFrame, colName: String, target: String, para: Int): DataFrame = {
     val selector = new ChiSqSelector().setSelectorType("numTopFeatures")
       .setNumTopFeatures(para)
       .setFeaturesCol(colName)
@@ -37,7 +37,8 @@ trait ColumnFeatureETS {
 
     result.transform(cv.transform(df))
   }
-  def chiSqSelectorPer(cv: CountVectorizerModel, df: DataFrame, colName: String, target: String, para:Double): DataFrame = {
+
+  def chiSqSelectorPer(cv: CountVectorizerModel, df: DataFrame, colName: String, target: String, para: Double): DataFrame = {
     val selector = new ChiSqSelector().setSelectorType("percentile")
       .setPercentile(para)
       .setFeaturesCol(colName)
@@ -55,7 +56,8 @@ trait ColumnFeatureETS {
 
     result.transform(cv.transform(df))
   }
-  def chiSqSelectorFpr(cv: CountVectorizerModel, df: DataFrame, colName: String, target: String, para:Double): DataFrame = {
+
+  def chiSqSelectorFpr(cv: CountVectorizerModel, df: DataFrame, colName: String, target: String, para: Double): DataFrame = {
     val selector = new ChiSqSelector().setSelectorType("fpr")
       .setFpr(para)
       .setFeaturesCol(colName)
@@ -79,11 +81,13 @@ trait ColumnFeatureETS {
     val result = chiSqSelectorNum(cv, df, colName + "_features", target, para)
     result
   }
+
   def extractAndSelectPer(df: DataFrame, colName: String, target: String, para: Double): DataFrame = {
     val cv = extractFeatures(df, colName)
     val result = chiSqSelectorPer(cv, df, colName + "_features", target, para)
     result
   }
+
   def extractAndSelectFpr(df: DataFrame, colName: String, target: String, para: Double): DataFrame = {
     val cv = extractFeatures(df, colName)
     val result = chiSqSelectorFpr(cv, df, colName + "_features", target, para)
@@ -98,4 +102,13 @@ case class categoriesETS() extends ColumnFeatureETS {
 }
 
 case class tagsETS() extends ColumnFeatureETS {
+}
+
+case class developerETS() extends ColumnFeatureETS {
+}
+
+case class publisherETS() extends ColumnFeatureETS {
+}
+
+case class priceETS() extends ColumnFeatureETS {
 }
