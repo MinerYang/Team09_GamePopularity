@@ -1,6 +1,7 @@
 package data
 
 import org.apache.spark.ml.feature.{CountVectorizer, CountVectorizerModel, ChiSqSelector, ChiSqSelectorModel}
+import org.apache.spark.ml.feature.MinMaxScaler
 import org.apache.spark.sql.DataFrame
 
 //Column Feature Extractor,Transformer,Selector
@@ -17,6 +18,24 @@ trait ColumnFeatureETS {
     //    }
     //    println()
     cvModel
+  }
+  def chiSqSelector(df: DataFrame, colName: String, target: String, para: Double): DataFrame = {
+    val selector = new ChiSqSelector().setSelectorType("fpr")
+      .setFpr(para)
+      .setFeaturesCol(colName)
+      .setLabelCol(target)
+      .setOutputCol("selected_" + colName + "_Features")
+
+    val result: ChiSqSelectorModel = selector.fit(df)
+
+    println(s"ChiSqSelector output with top ${result.selectedFeatures.size} ${colName} selected")
+
+    for (f <- result.selectedFeatures) {
+      print(f + " ")
+    }
+    println()
+
+    result.transform(df)
   }
 
   def chiSqSelectorNum(cv: CountVectorizerModel, df: DataFrame, colName: String, target: String, para: Int): DataFrame = {
@@ -111,4 +130,12 @@ case class publisherETS() extends ColumnFeatureETS {
 }
 
 case class priceETS() extends ColumnFeatureETS {
+  def minMaxSca(df:DataFrame,colName:String):DataFrame = {
+    val scaler = new MinMaxScaler()
+      .setInputCol(colName)
+      .setOutputCol(colName + "_features")
+
+    val scalerModel = scaler.fit(df)
+    scalerModel.transform(df)
+  }
 }
