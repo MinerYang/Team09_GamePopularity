@@ -22,22 +22,25 @@ case object SteamSQLDF {
     val rawTable = processRatings(getRawTable(df))
     //    rawTable.where("ratings = 0").show()
 
-//    val df1 = PlatformETS().extract(rawTable, "platforms")
-//          .withColumn("platforms_features", sparseToDense($"platforms_features"))
-//    PlatformETS().chiSqSelect(df1, "platforms_features", "ratings", 2)
+    val df1 = PlatformETS().extractAndSelect(rawTable, "platforms", "ratings", 3)
+      .withColumn("platforms_features", sparseToDense($"platforms_features"))
 
-    val df2 = categoriesETS().extract(rawTable, "categories")
-      .withColumn("categories_features", sparseToDense($"categories_features"))
-    categoriesETS().chiSqSelect(df2, "categories_features", "ratings", 50)
+    val df2 = categoriesETS().extractAndSelect(df1, "categories", "ratings", 0.5)
+
+    val df3 = tagsETS().extractAndSelect(df2, "tags", "ratings", 50)
+    df3.show()
   }
 
   def vecToArray = udf((v: Vector) => v.toArray)
+
   def sparseToDense = udf((v: Vector) => v.toDense)
+
   def denseToSparse = udf((v: Vector) => v.toSparse)
 
   def getRawTable(df: DataFrame): DataFrame = df.withColumn("platforms", split(df("platforms"), ";"))
     .withColumn("categories", split(df("categories"), ";"))
     .withColumn("steamspy_tags", split(df("steamspy_tags"), ";"))
+    .withColumnRenamed("steamspy_tags", "tags")
     .drop("name", "release_date", "english", "achievements", "genres",
       "required_age", "average_playtime", "median_playtime", "owners")
 
@@ -53,5 +56,6 @@ case object SteamSQLDF {
       .withColumnRenamed("positive_ratings", "ratings")
       .drop("negative_ratings")
   }
+
 }
 
