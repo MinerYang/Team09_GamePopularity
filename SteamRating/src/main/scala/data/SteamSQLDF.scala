@@ -53,33 +53,23 @@ case object SteamSQLDF {
     //    table.printSchema()
     //    table.where("ratings = 0").show()
 
-    val dfPrice = priceETS().minMaxSca(table, "price")
-    val dfPrice1 = priceETS().chiSqSelector(dfPrice, "price_features", "ratings", 0.01)
-    dfPrice1.show()
-    print(dfPrice1.count())
+    val dfP = priceETS().minMaxSca(table, "price")
+    //    val df1 = table.select(concat_ws(",", $"developer", $"publisher", $"platforms", $"categories", $"tags").cast(StringType).as("features"))
 
-    //    val df1 = PlatformETS().extractAndSelectFpr(table, "platforms", "ratings", 0.01)
-    //      .withColumn("platforms_features", sparseToDense($"platforms_features"))
-    //
-    //    val df2 = categoriesETS().extractAndSelectFpr(df1, "categories", "ratings", 0.01)
-    //
-    //    val df3 = tagsETS().extractAndSelectFpr(df2, "tags", "ratings", 0.01)
-    //
-    //    val df4 = developerETS().extractAndSelectFpr(df3, "developer", target = "ratings", para = 0.01)
-    //
-    //    val df5 = publisherETS().extractAndSelectFpr(df4, "publisher", target = "ratings", para = 0.01)
-    //
-    //    df5.show()
+    //    val result = EtsHelper().extractAndSelectFpr(df2, "features", "ratings", 0.01)
+
+    val dfPrice = priceETS().chiSqSelectorFpr(dfP, "price_features", "ratings", 0.01)
+    val dfPlat = PlatformETS().extractAndSelectFpr(dfPrice, "platforms", "ratings", 0.01)
+    val dfCate = categoriesETS().extractAndSelectFpr(dfPlat, "categories", "ratings", 0.01)
+    val dfTag = tagsETS().extractAndSelectFpr(dfCate, "tags", "ratings", 0.01)
+    val dfDev = developerETS().extractAndSelectFpr(dfTag, "developer", target = "ratings", para = 0.01)
+    val dfPub = publisherETS().extractAndSelectFpr(dfDev, "publisher", target = "ratings", para = 0.01)
+
+    val dfAssembled = EtsHelper().vectorAss(dfPub,"Features")
+    dfAssembled.show()
+
     ss.stop()
   }
-
-  def vecToArray = udf((v: Vector) => v.toArray)
-
-  def doubleToVector = udf((ddd: Double) => Vectors.dense(ddd))
-
-  def sparseToDense = udf((v: Vector) => v.toDense)
-
-  def denseToSparse = udf((v: Vector) => v.toSparse)
 
   def getRawTable(df: DataFrame): DataFrame = df
     .withColumn("developer", split(df("developer"), ";"))
@@ -110,5 +100,13 @@ case object SteamSQLDF {
   }
 
   def initTable(df: DataFrame): DataFrame = processPrice(processRatings(getRawTable(df)))
+
+  def vecToArray = udf((v: Vector) => v.toArray)
+
+  def doubleToVector = udf((ddd: Double) => Vectors.dense(ddd))
+
+  def sparseToDense = udf((v: Vector) => v.toDense)
+
+  def denseToSparse = udf((v: Vector) => v.toSparse)
 }
 

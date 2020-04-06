@@ -1,7 +1,6 @@
 package data
 
-import org.apache.spark.ml.feature.{CountVectorizer, CountVectorizerModel, ChiSqSelector, ChiSqSelectorModel}
-import org.apache.spark.ml.feature.MinMaxScaler
+import org.apache.spark.ml.feature.{MinMaxScaler, VectorAssembler, CountVectorizer, CountVectorizerModel, ChiSqSelector, ChiSqSelectorModel}
 import org.apache.spark.sql.DataFrame
 
 //Column Feature Extractor,Transformer,Selector
@@ -19,21 +18,17 @@ trait ColumnFeatureETS {
     //    println()
     cvModel
   }
-  def chiSqSelector(df: DataFrame, colName: String, target: String, para: Double): DataFrame = {
+
+  def chiSqSelectorFpr(df: DataFrame, colName: String, target: String, para: Double): DataFrame = {
     val selector = new ChiSqSelector().setSelectorType("fpr")
       .setFpr(para)
       .setFeaturesCol(colName)
       .setLabelCol(target)
-      .setOutputCol("selected_" + colName + "_Features")
+      .setOutputCol("selected_" + colName)
 
     val result: ChiSqSelectorModel = selector.fit(df)
 
     println(s"ChiSqSelector output with top ${result.selectedFeatures.size} ${colName} selected")
-
-    for (f <- result.selectedFeatures) {
-      print(f + " ")
-    }
-    println()
 
     result.transform(df)
   }
@@ -43,14 +38,14 @@ trait ColumnFeatureETS {
       .setNumTopFeatures(para)
       .setFeaturesCol(colName)
       .setLabelCol(target)
-      .setOutputCol("selected_" + colName + "_Features")
+      .setOutputCol("selected_" + colName)
 
     val result: ChiSqSelectorModel = selector.fit(cv.transform(df))
 
     println(s"ChiSqSelector output with top ${result.selectedFeatures.size} ${colName} selected")
 
     for (f <- result.selectedFeatures) {
-      print(cv.vocabulary(f) + " ")
+      print(cv.vocabulary(f) + ",")
     }
     println()
 
@@ -62,14 +57,14 @@ trait ColumnFeatureETS {
       .setPercentile(para)
       .setFeaturesCol(colName)
       .setLabelCol(target)
-      .setOutputCol("selected_" + colName + "_Features")
+      .setOutputCol("selected_" + colName)
 
     val result: ChiSqSelectorModel = selector.fit(cv.transform(df))
 
     println(s"ChiSqSelector output with top ${result.selectedFeatures.size} ${colName} selected")
 
     for (f <- result.selectedFeatures) {
-      print(cv.vocabulary(f) + " ")
+      print(cv.vocabulary(f) + ";")
     }
     println()
 
@@ -81,14 +76,14 @@ trait ColumnFeatureETS {
       .setFpr(para)
       .setFeaturesCol(colName)
       .setLabelCol(target)
-      .setOutputCol("selected_" + colName + "_Features")
+      .setOutputCol("selected_" + colName)
 
     val result: ChiSqSelectorModel = selector.fit(cv.transform(df))
 
     println(s"ChiSqSelector output with top ${result.selectedFeatures.size} ${colName} selected")
 
     for (f <- result.selectedFeatures) {
-      print(cv.vocabulary(f) + " ")
+      print(cv.vocabulary(f) + ";")
     }
     println()
 
@@ -130,12 +125,27 @@ case class publisherETS() extends ColumnFeatureETS {
 }
 
 case class priceETS() extends ColumnFeatureETS {
-  def minMaxSca(df:DataFrame,colName:String):DataFrame = {
+  def minMaxSca(df: DataFrame, colName: String): DataFrame = {
     val scaler = new MinMaxScaler()
       .setInputCol(colName)
       .setOutputCol(colName + "_features")
 
     val scalerModel = scaler.fit(df)
     scalerModel.transform(df)
+  }
+
+}
+
+case class EtsHelper() extends ColumnFeatureETS {
+  def vectorAss(df: DataFrame, colName: String): DataFrame = {
+    val assembler = new VectorAssembler()
+      .setInputCols(Array("selected_price_features", "selected_platforms_features", "selected_categories_features", "selected_tags_features",
+        "selected_developer_features", "selected_publisher_features"))
+      .setOutputCol("features")
+    assembler.transform(df).drop("appid","developer","publisher","platforms","categories","tags","price",
+      "appid_features","developer_features","publisher_features","platforms_features","categories_features","tags_features","price_features",
+      "selected_appid_features","selected_developer_features","selected_publisher_features","selected_platforms_features",
+      "selected_categories_features","selected_tags_features","selected_price_features"
+    )
   }
 }
