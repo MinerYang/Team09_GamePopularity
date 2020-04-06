@@ -1,7 +1,8 @@
 package data
-
-import org.apache.spark.ml.feature.{MinMaxScaler, VectorAssembler, CountVectorizer, CountVectorizerModel, ChiSqSelector, ChiSqSelectorModel}
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.ml.linalg.{Vector, Vectors}
+import org.apache.spark.ml.feature.{MinMaxScaler, CountVectorizer, CountVectorizerModel, ChiSqSelector, ChiSqSelectorModel,VectorAssembler,LabeledPoint}
+
 
 //Column Feature Extractor,Transformer,Selector
 trait ColumnFeatureETS {
@@ -148,4 +149,5 @@ case class EtsHelper() extends ColumnFeatureETS {
       "selected_categories_features","selected_tags_features","selected_price_features"
     )
   }
+
 }

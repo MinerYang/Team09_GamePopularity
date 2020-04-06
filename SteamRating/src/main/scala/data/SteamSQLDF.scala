@@ -1,9 +1,12 @@
 package data
 
+import java.io.File
+
+import org.apache.spark.ml.feature.LabeledPoint
+import org.apache.spark.ml.linalg.{SparseVector, Vector, Vectors}
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{StructField, _}
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.ml.linalg.{Vector, Vectors}
-import org.apache.spark.sql.functions._
 
 case object SteamSQLDF {
   lazy val appName = "SteamDataCleansing"
@@ -65,8 +68,14 @@ case object SteamSQLDF {
     val dfDev = developerETS().extractAndSelectFpr(dfTag, "developer", target = "ratings", para = 0.01)
     val dfPub = publisherETS().extractAndSelectFpr(dfDev, "publisher", target = "ratings", para = 0.01)
 
-    val dfAssembled = EtsHelper().vectorAss(dfPub,"Features")
+    val dfAssembled = EtsHelper().vectorAss(dfPub, "Features")
     dfAssembled.show()
+
+    val labeled = dfAssembled.map(row => LabeledPoint(row.getAs[Double]("ratings"),
+      row.getAs[Vector]("features")))
+//    val path = new File("/data")
+//    if (path.isFile()) path.delete()
+    labeled.write.format("libsvm").save("/data")
 
     ss.stop()
   }
@@ -85,12 +94,12 @@ case object SteamSQLDF {
     //TODO: maybe total=0?
     val total_ratings = df("positive_ratings") + df("negative_ratings")
     val r = df("positive_ratings") / total_ratings
-    df.withColumn("positive_ratings", when(r >= 0.95, 5)
-      .when(r >= 0.8, 4)
-      .when(r >= 0.7, 3)
-      .when(r >= 0.4, 2)
-      .when(r >= 0.2, 1)
-      .otherwise(0)) // ratings to categorical type
+    df.withColumn("positive_ratings", when(r >= 0.95, 5.0)
+      .when(r >= 0.8, 4.0)
+      .when(r >= 0.7, 3.0)
+      .when(r >= 0.4, 2.0)
+      .when(r >= 0.2, 1.0)
+      .otherwise(0.0)) // ratings to categorical type
       .withColumnRenamed("positive_ratings", "ratings")
       .drop("negative_ratings")
   }
@@ -108,5 +117,6 @@ case object SteamSQLDF {
   def sparseToDense = udf((v: Vector) => v.toDense)
 
   def denseToSparse = udf((v: Vector) => v.toSparse)
+
 }
 
