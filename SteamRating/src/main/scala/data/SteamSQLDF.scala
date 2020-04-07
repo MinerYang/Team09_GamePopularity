@@ -39,12 +39,14 @@ case object SteamSQLDF {
       StructField("owners", DataTypes.StringType),
       StructField("price", DataTypes.DoubleType),
     ))
-
-    val df: DataFrame = ss.read.format("com.databricks.spark.csv")
+    //      .format("com.databricks.spark.csv")
+    val df: DataFrame = ss.read.format("org.apache.spark.csv")
       .option("header", "true")
       .schema(schema)
-      .load("Steam.csv")
-
+      .option("dateFormat", "m/d/YYYY")
+      .csv("hdfs://localhost:9000/steam.csv")
+    df.printSchema()
+    df.show()
     val tableNaDropped = df.na.drop()
     //    val df: DataFrame = ss.read.format("com.databricks.spark.csv")
     //      .option("header", "true")
@@ -73,9 +75,8 @@ case object SteamSQLDF {
 
     val labeled = dfAssembled.map(row => LabeledPoint(row.getAs[Double]("ratings"),
       row.getAs[Vector]("features")))
-//    val path = new File("/data")
-//    if (path.isFile()) path.delete()
-    labeled.write.format("libsvm").save("/data")
+
+    labeled.write.format("libsvm").save("hdfs://localhost:9000/123.txt")
 
     ss.stop()
   }
