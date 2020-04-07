@@ -1,7 +1,6 @@
 package data
 
-import java.io.File
-
+import org.apache.hadoop.fs.Path
 import org.apache.spark.ml.feature.LabeledPoint
 import org.apache.spark.ml.linalg.{SparseVector, Vector, Vectors}
 import org.apache.spark.sql.functions._
@@ -44,9 +43,8 @@ case object SteamSQLDF {
       .option("header", "true")
       .schema(schema)
       .option("dateFormat", "m/d/YYYY")
-      .csv("hdfs://localhost:9000/steam.csv")
-    df.printSchema()
-    df.show()
+      .csv("hdfs://localhost:9000/CSYE7200/steam.csv")
+
     val tableNaDropped = df.na.drop()
     //    val df: DataFrame = ss.read.format("com.databricks.spark.csv")
     //      .option("header", "true")
@@ -76,7 +74,12 @@ case object SteamSQLDF {
     val labeled = dfAssembled.map(row => LabeledPoint(row.getAs[Double]("ratings"),
       row.getAs[Vector]("features")))
 
-    labeled.write.format("libsvm").save("hdfs://localhost:9000/123.txt")
+
+    val output = new Path("hdfs://localhost:9000/CSYE7200/steam-data-for-ml");
+    val hdfs = org.apache.hadoop.fs.FileSystem.get(
+      new java.net.URI("hdfs://localhost:9000"), new org.apache.hadoop.conf.Configuration())
+    if (hdfs.exists(output)) hdfs.delete(output, true)
+    labeled.write.format("libsvm").save("hdfs://localhost:9000/CSYE7200/steam-data-for-ml")
 
     ss.stop()
   }
