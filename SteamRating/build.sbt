@@ -10,3 +10,7 @@ libraryDependencies += "org.apache.spark" %% "spark-mllib" % "2.4.5"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0" % "test"
 
+libraryDependencies += "ml.combust.mleap" %% "mleap-spark" % "0.15.0"
+libraryDependencies += "ml.combust.mleap" %% "mleap-runtime" % "0.15.0"
+libraryDependencies += "ml.combust.mleap" %% "mleap-spark-extension" % "0.15.0"
+
