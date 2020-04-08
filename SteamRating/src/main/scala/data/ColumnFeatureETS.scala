@@ -91,6 +91,25 @@ trait ColumnFeatureETS {
     result.transform(cv.transform(df))
   }
 
+  def chiSqSelectorFdr(cv: CountVectorizerModel, df: DataFrame, colName: String, target: String, para: Double): DataFrame = {
+    val selector = new ChiSqSelector().setSelectorType("fdr")
+      .setFdr(para)
+      .setFeaturesCol(colName)
+      .setLabelCol(target)
+      .setOutputCol("selected_" + colName)
+
+    val result: ChiSqSelectorModel = selector.fit(cv.transform(df))
+
+    println(s"ChiSqSelector output with top ${result.selectedFeatures.size} ${colName} selected")
+
+    for (f <- result.selectedFeatures) {
+      print(cv.vocabulary(f) + ";")
+    }
+    println()
+
+    result.transform(cv.transform(df))
+  }
+
   def extractAndSelectNum(df: DataFrame, colName: String, target: String, para: Int): DataFrame = {
     val cv = extractFeatures(df, colName)
     val result = chiSqSelectorNum(cv, df, colName + "_features", target, para)
@@ -106,6 +125,12 @@ trait ColumnFeatureETS {
   def extractAndSelectFpr(df: DataFrame, colName: String, target: String, para: Double): DataFrame = {
     val cv = extractFeatures(df, colName)
     val result = chiSqSelectorFpr(cv, df, colName + "_features", target, para)
+    result
+  }
+
+  def extractAndSelectFdr(df: DataFrame, colName: String, target: String, para: Double): DataFrame = {
+    val cv = extractFeatures(df, colName)
+    val result = chiSqSelectorFdr(cv, df, colName + "_features", target, para)
     result
   }
 }

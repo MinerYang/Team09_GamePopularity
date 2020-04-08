@@ -10,6 +10,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 case object SteamSQLDF {
   lazy val appName = "SteamDataCleansing"
   lazy val master = "local[*]"
+  lazy val threshold = 0.1
 
   def main(args: Array[String]) {
     val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
@@ -61,12 +62,12 @@ case object SteamSQLDF {
 
     //    val result = EtsHelper().extractAndSelectFpr(df2, "features", "ratings", 0.01)
 
-    val dfPrice = priceETS().chiSqSelectorFpr(dfP, "price_features", "ratings", 0.01)
-    val dfPlat = PlatformETS().extractAndSelectFpr(dfPrice, "platforms", "ratings", 0.01)
-    val dfCate = categoriesETS().extractAndSelectFpr(dfPlat, "categories", "ratings", 0.01)
-    val dfTag = tagsETS().extractAndSelectFpr(dfCate, "tags", "ratings", 0.01)
-    val dfDev = developerETS().extractAndSelectFpr(dfTag, "developer", target = "ratings", para = 0.01)
-    val dfPub = publisherETS().extractAndSelectFpr(dfDev, "publisher", target = "ratings", para = 0.01)
+    val dfPrice = priceETS().chiSqSelectorFpr(dfP, "price_features", "ratings", threshold)
+    val dfPlat = PlatformETS().extractAndSelectFdr(dfPrice, "platforms", "ratings", threshold)
+    val dfCate = categoriesETS().extractAndSelectFdr(dfPlat, "categories", "ratings", threshold)
+    val dfTag = tagsETS().extractAndSelectFdr(dfCate, "tags", "ratings", threshold)
+    val dfDev = developerETS().extractAndSelectFdr(dfTag, "developer", target = "ratings", threshold)
+    val dfPub = publisherETS().extractAndSelectFdr(dfDev, "publisher", target = "ratings", threshold)
 
     val dfAssembled = EtsHelper().vectorAss(dfPub, "Features")
     dfAssembled.show()

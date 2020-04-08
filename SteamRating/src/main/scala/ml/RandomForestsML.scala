@@ -39,7 +39,8 @@ case object RandomForestsML {
     val rf = new RandomForestClassifier()
       .setLabelCol("indexedLabel")
       .setFeaturesCol("indexedFeatures")
-      .setNumTrees(10)
+      .setNumTrees(50)
+      .setMaxDepth(15)
 
     // Convert indexed labels back to original labels.
     val labelConverter = new IndexToString()
@@ -68,7 +69,7 @@ case object RandomForestsML {
     val accuracy = evaluator.evaluate(predictions)
     println(s"Test Error = ${(1.0 - accuracy)}")
 
-    val rfModel = model.stages(2).asInstanceOf[RandomForestClassificationModel]
-    println(s"Learned classification forest model:\n ${rfModel.toDebugString}")
+//    val rfModel = model.stages(2).asInstanceOf[RandomForestClassificationModel]
+//    println(s"Learned classification forest model:\n ${rfModel.toDebugString}")
   }
 }
