@@ -44,7 +44,8 @@ case object SteamSQLDF {
       .option("header", "true")
       .schema(schema)
       .option("dateFormat", "m/d/YYYY")
-      .csv("hdfs://localhost:9000/CSYE7200/steam.csv")
+      .csv("./steam.csv")
+      //.csv("hdfs://localhost:9000/CSYE7200/steam.csv")
 
     val tableNaDropped = df.na.drop()
     //    val df: DataFrame = ss.read.format("com.databricks.spark.csv")
@@ -76,12 +77,12 @@ case object SteamSQLDF {
       row.getAs[Vector]("features")))
 
 
-    val output = new Path("hdfs://localhost:9000/CSYE7200/steam-data-for-ml");
-    val hdfs = org.apache.hadoop.fs.FileSystem.get(
-      new java.net.URI("hdfs://localhost:9000"), new org.apache.hadoop.conf.Configuration())
-    if (hdfs.exists(output)) hdfs.delete(output, true)
-    labeled.write.format("libsvm").save("hdfs://localhost:9000/CSYE7200/steam-data-for-ml")
-
+//    val output = new Path("hdfs://localhost:9000/CSYE7200/steam-data-for-ml");
+//    val hdfs = org.apache.hadoop.fs.FileSystem.get(
+//      new java.net.URI("hdfs://localhost:9000"), new org.apatput, true)
+    //   // labeled.write.format("libsvm").save("hdche.hadoop.conf.Configuration())
+//    if (hdfs.exists(output)) hdfs.delete(oufs://localhost:9000/CSYE7200/steam-data-for-ml")
+      labeled.write.format("libsvm").save("D:/Idea Proj/Team09_GamePopularity/steam-data-ml")
     ss.stop()
   }
 

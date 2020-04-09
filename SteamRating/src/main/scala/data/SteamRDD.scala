@@ -14,6 +14,7 @@ case object SteamRDD {
     //run locally, and set up number of threads
     //e.g. setMaster("local[2]")
     val conf = new SparkConf().setAppName("SteamDataCleansing").setMaster("local[*]")
+    //conf.set("spark.testing.memory","2147480000")
     val sc = new SparkContext(conf)
 
     //wordcount: counting number of lines containing "spark"
