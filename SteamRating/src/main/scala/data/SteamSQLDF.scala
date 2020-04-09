@@ -57,6 +57,11 @@ case object SteamSQLDF {
     val table = initTable(tableNaDropped)
     //    table.printSchema()
     //    table.where("ratings = 0").show()
+    println(table.where("ratings = 0").count()+": [r=0]")
+    println(table.where("ratings = 1").count()+": [r=1]")
+    println(table.where("ratings = 2").count()+": [r=2]")
+    println(table.where("ratings = 3").count()+": [r=3]")
+    println(table.where("ratings = 4").count()+": [r=4]")
 
     val dfP = priceETS().minMaxSca(table, "price")
     //    val df1 = table.select(concat_ws(",", $"developer", $"publisher", $"platforms", $"categories", $"tags").cast(StringType).as("features"))
@@ -116,21 +121,9 @@ case object SteamSQLDF {
       .otherwise(1.0))
       .withColumnRenamed("positive_ratings", "ratings")
       .drop("negative_ratings", "total")
+
   }
 
-  //  def processRatings(df: DataFrame): DataFrame = {
-  //    //TODO: maybe total=0?
-  //    val total_ratings = df("positive_ratings") + df("negative_ratings")
-  //    val r = df("positive_ratings") / total_ratings
-  //    df.withColumn("positive_ratings", when(r >= 0.95, 5.0)
-  //      .when(r >= 0.8, 4.0)
-  //      .when(r >= 0.7, 3.0)
-  //      .when(r >= 0.4, 2.0)
-  //      .when(r >= 0.2, 1.0)
-  //      .otherwise(0.0)) // ratings to categorical type
-  //      .withColumnRenamed("positive_ratings", "ratings")
-  //      .drop("negative_ratings")
-  //  }
   def processPrice(df: DataFrame): DataFrame = {
     df.withColumn("price", doubleToVector(df("price")))
   }
