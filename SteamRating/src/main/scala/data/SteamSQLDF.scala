@@ -2,7 +2,7 @@ package data
 
 import org.apache.hadoop.fs.Path
 import org.apache.spark.ml.feature.LabeledPoint
-import org.apache.spark.ml.linalg.{SparseVector, Vector, Vectors}
+import org.apache.spark.ml.linalg.{Vector, Vectors}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{StructField, _}
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -10,7 +10,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 case object SteamSQLDF {
   lazy val appName = "SteamDataCleansing"
   lazy val master = "local[*]"
-  lazy val threshold = 0.1
+  lazy val threshold = 0.05
 
   def main(args: Array[String]) {
     val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
@@ -97,23 +97,35 @@ case object SteamSQLDF {
 
   def processRatings(df: DataFrame): DataFrame = {
     //TODO: maybe total=0?
-    val total_ratings = df("positive_ratings") + df("negative_ratings")
-    val r = df("positive_ratings") / total_ratings
-    df.withColumn("positive_ratings", when(r >= 0.95, 5.0)
-      .when(r >= 0.8, 4.0)
-      .when(r >= 0.7, 3.0)
-      .when(r >= 0.4, 2.0)
-      .when(r >= 0.2, 1.0)
-      .otherwise(0.0)) // ratings to categorical type
+    val t = df("positive_ratings") + df("negative_ratings")
+    val r = df("positive_ratings") / t
+    val tMean = df.agg(mean(t)).first().getAs[Double](0)
+    val tStd = df.agg(stddev(t)).as("std").first().getAs[Double](0)
+    df.withColumn("positive_ratings", when(t <= tMean, 0.0)
+      .when(r < 0.7, 1.0)
+      .otherwise(2.0))
       .withColumnRenamed("positive_ratings", "ratings")
       .drop("negative_ratings")
   }
 
+  //  def processRatings(df: DataFrame): DataFrame = {
+  //    //TODO: maybe total=0?
+  //    val total_ratings = df("positive_ratings") + df("negative_ratings")
+  //    val r = df("positive_ratings") / total_ratings
+  //    df.withColumn("positive_ratings", when(r >= 0.95, 5.0)
+  //      .when(r >= 0.8, 4.0)
+  //      .when(r >= 0.7, 3.0)
+  //      .when(r >= 0.4, 2.0)
+  //      .when(r >= 0.2, 1.0)
+  //      .otherwise(0.0)) // ratings to categorical type
+  //      .withColumnRenamed("positive_ratings", "ratings")
+  //      .drop("negative_ratings")
+  //  }
   def processPrice(df: DataFrame): DataFrame = {
     df.withColumn("price", doubleToVector(df("price")))
   }
 
-  def initTable(df: DataFrame): DataFrame = processPrice(processRatings(getRawTable(df)))
+  def initTable(df: DataFrame): DataFrame = getRawTable(processRatings(processPrice(df)))
 
   def vecToArray = udf((v: Vector) => v.toArray)
 

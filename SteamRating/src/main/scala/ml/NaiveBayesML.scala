@@ -17,7 +17,7 @@ case object NaiveBayesML {
       .load("hdfs://localhost:9000/CSYE7200/steam-data-for-ml")
 
     // Split the data into training and test sets (30% held out for testing)
-    val Array(trainingData, testData) = data.randomSplit(Array(0.7, 0.3), seed = 1234L)
+    val Array(trainingData, testData) = data.randomSplit(Array(0.7, 0.3), seed = 6789L)
 
     // Train a NaiveBayes model.
     val model = new NaiveBayes()
@@ -25,7 +25,7 @@ case object NaiveBayesML {
 
     // Select example rows to display.
     val predictions = model.transform(testData)
-    predictions.show()
+    predictions.show(250)
 
     // Select (prediction, true label) and compute test error
     val evaluator = new MulticlassClassificationEvaluator()
