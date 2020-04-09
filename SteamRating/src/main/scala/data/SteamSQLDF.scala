@@ -3,6 +3,7 @@ package data
 import org.apache.hadoop.fs.Path
 import org.apache.spark.ml.feature.LabeledPoint
 import org.apache.spark.ml.linalg.{Vector, Vectors}
+import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{StructField, _}
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -99,13 +100,22 @@ case object SteamSQLDF {
     //TODO: maybe total=0?
     val t = df("positive_ratings") + df("negative_ratings")
     val r = df("positive_ratings") / t
-    val tMean = df.agg(mean(t)).first().getAs[Double](0)
-    val tStd = df.agg(stddev(t)).as("std").first().getAs[Double](0)
-    df.withColumn("positive_ratings", when(t <= tMean, 0.0)
-      .when(r < 0.7, 1.0)
-      .otherwise(2.0))
+    //    val tMean: Double = df.agg(mean(t)).as("mean").first().getAs[Double](0)
+    //    val tStd: Double = df.agg(stddev(t)).as("std").first().getAs[Double](0)
+    val tMed: Double = {
+      df.withColumn("total", t).createOrReplaceTempView("total")
+      val fewRev = df.sqlContext.sql("SELECT percentile(total, 0.67) FROM total").first().getAs[Double](0)
+      println("if number of ratings is less than {" + fewRev + "} will be considered as FEW REVIEWS")
+      fewRev
+    }
+
+    df.withColumn("positive_ratings", when(t < tMed, 0.0)
+      .when(r >= 0.95, 4.0)
+      .when(r >= 0.7, 3.0)
+      .when(r >= 0.4, 2.0)
+      .otherwise(1.0))
       .withColumnRenamed("positive_ratings", "ratings")
-      .drop("negative_ratings")
+      .drop("negative_ratings", "total")
   }
 
   //  def processRatings(df: DataFrame): DataFrame = {
