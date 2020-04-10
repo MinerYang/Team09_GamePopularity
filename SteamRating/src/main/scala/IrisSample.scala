@@ -1,7 +1,7 @@
-import org.apache.spark.ml.Pipeline
-import org.apache.spark.ml.feature.{StringIndexer, VectorAssembler,IndexToString}
+import org.apache.spark.ml.{Pipeline, PipelineModel}
+import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorAssembler}
 import org.apache.spark.ml.mleap.SparkUtil
-//import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
 import org.apache.spark.ml.classification.RandomForestClassifier
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.sql.SparkSession
@@ -50,8 +50,9 @@ case object IrisSample{
       .setLabels(lableIndexer.labels)
 
 //    val stages = Array(assembler, indexer, randomForestClassifier)
-    val stages = Array(assembler, lableIndexer, randomForestClassifier,labelConverter)
+    val stages = Array(assembler, indexer, randomForestClassifier,labelConverter)
     val pipeline = new Pipeline().setStages(stages)
+
     val pipelineModel = pipeline.fit(pltrainingSet)
     val pipelinePredictionDf = pipelineModel.transform(pltestSet)
     pipelinePredictionDf.show(5)
@@ -59,11 +60,13 @@ case object IrisSample{
     /**
      * save model locally
      */
-    pipelineModel.write.overwrite().save("/Users/mineryang/Desktop/PipelineIrisModel2")
+    pipelineModel.write.overwrite().save("/Users/mineryang/Desktop/PipelineIrisModel3")
 
 
 
-//    import ml.combust.bundle.BundleFile
+
+
+    //    import ml.combust.bundle.BundleFile
 //    import org.apache.spark.ml.bundle.SparkBundleContext
 //    import ml.combust.bundle.serializer.SerializationFormat
 //    import resource._
