@@ -54,7 +54,7 @@ case object NaiveBayesML {
       .setPredictionCol("prediction")
       .setMetricName("weightedRecall")
     val weightedRecall = evaluator4.evaluate(predictions)
-    println(s"Test set accuracy = $weightedRecall")
+    println(s"Test set weightedRecall = $weightedRecall")
   }
 }
 

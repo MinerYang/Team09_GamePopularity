@@ -3,7 +3,6 @@ package data
 import org.apache.hadoop.fs.Path
 import org.apache.spark.ml.feature.LabeledPoint
 import org.apache.spark.ml.linalg.{Vector, Vectors}
-import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{StructField, _}
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -11,7 +10,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 case object SteamSQLDF {
   lazy val appName = "SteamDataCleansing"
   lazy val master = "local[*]"
-  lazy val threshold = 0.05
+    lazy val threshold = 0.01
 
   def main(args: Array[String]) {
     val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
@@ -109,7 +108,7 @@ case object SteamSQLDF {
     //    val tStd: Double = df.agg(stddev(t)).as("std").first().getAs[Double](0)
     val tMed: Double = {
       df.withColumn("total", t).createOrReplaceTempView("total")
-      val fewRev = df.sqlContext.sql("SELECT percentile(total, 0.67) FROM total").first().getAs[Double](0)
+      val fewRev = df.sqlContext.sql("SELECT percentile(total, 0.5) FROM total").first().getAs[Double](0)
       println("if number of ratings is less than {" + fewRev + "} will be considered as FEW REVIEWS")
       fewRev
     }
