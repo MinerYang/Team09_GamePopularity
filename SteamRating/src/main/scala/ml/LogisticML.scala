@@ -1,7 +1,10 @@
 package ml
 
+import org.apache.spark.ml.{Pipeline, PipelineModel}
+import org.apache.spark.ml.classification.{LogisticRegression, LogisticRegressionModel}
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.ml.classification.LogisticRegression
 
 case object LogisticML {
   lazy val appName = "SteamDataCleansing"
@@ -15,13 +18,37 @@ case object LogisticML {
     val training = ss.read.format("libsvm")
       .load("hdfs://localhost:9000/CSYE7200/steam-data-for-ml")
 
-    val lr = new LogisticRegression()
-      .setMaxIter(10)
-      .setRegParam(0.3)
-      .setElasticNetParam(0.8)
+    val lr1 = new LogisticRegression()
+      .setMaxIter(20)
+    val pipeline = new Pipeline()
+      .setStages(Array(lr1))
 
-    // Fit the model
-    val lrModel = lr.fit(training)
+    // We use a ParamGridBuilder to construct a grid of parameters to search over.
+    // With 3 values for hashingTF.numFeatures and 2 values for lr.regParam,
+    // this grid will have 3 x 2 = 6 parameter settings for CrossValidator to choose from.
+    val paramGrid = new ParamGridBuilder()
+      .addGrid(lr1.regParam, Array(0.1, 0.01, 0.001, 0.0001))
+      .addGrid(lr1.elasticNetParam, Array(0.2, 0.5, 0.8))
+      .build()
+
+    // We now treat the Pipeline as an Estimator, wrapping it in a CrossValidator instance.
+    // This will allow us to jointly choose parameters for all Pipeline stages.
+    // A CrossValidator requires an Estimator, a set of Estimator ParamMaps, and an Evaluator.
+    // Note that the evaluator here is a BinaryClassificationEvaluator and its default metric
+    // is areaUnderROC.
+    val cv = new CrossValidator()
+      .setEstimator(pipeline)
+      .setEvaluator(new MulticlassClassificationEvaluator)
+      .setEstimatorParamMaps(paramGrid)
+      .setNumFolds(5) // Use 3+ in practice
+      .setParallelism(2) // Evaluate up to 2 parameter settings in parallel
+
+    // Run cross-validation, and choose the best set of parameters.
+    val cvModel = cv.fit(training)
+
+    ////////////////////////////////////////////////////////////////////////////////
+
+    val lrModel:LogisticRegressionModel = cvModel.bestModel.asInstanceOf[PipelineModel].stages(0).asInstanceOf[LogisticRegressionModel]
 
     // Print the coefficients and intercept for multinomial logistic regression
     println(s"Coefficients: \n${lrModel.coefficientMatrix}")
@@ -61,6 +88,7 @@ case object LogisticML {
       println(s"label $label: $f")
     }
 
+    println()
     val accuracy = trainingSummary.accuracy
     val falsePositiveRate = trainingSummary.weightedFalsePositiveRate
     val truePositiveRate = trainingSummary.weightedTruePositiveRate
