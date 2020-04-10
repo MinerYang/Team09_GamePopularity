@@ -62,6 +62,7 @@ case object SteamSQLDF {
     println(table.where("ratings = 3").count()+": [r=3]")
     println(table.where("ratings = 4").count()+": [r=4]")
 
+    // price = price/421.99 or 1
     val dfP = priceETS().minMaxSca(table, "price")
     //    val df1 = table.select(concat_ws(",", $"developer", $"publisher", $"platforms", $"categories", $"tags").cast(StringType).as("features"))
 
