@@ -28,7 +28,7 @@ case object LogisticML {
     // this grid will have 3 x 2 = 6 parameter settings for CrossValidator to choose from.
     val paramGrid = new ParamGridBuilder()
       .addGrid(lr.regParam, Array(0.1, 0.01, 0.001, 0.0001))
-      .addGrid(lr.elasticNetParam, Array(0.2, 0.5, 0.8))
+      .addGrid(lr.elasticNetParam, Array(0.2, 0.4, 0.5, 0.7, 0.8))
       .build()
 
     // We now treat the Pipeline as an Estimator, wrapping it in a CrossValidator instance.
@@ -49,8 +49,8 @@ case object LogisticML {
     ////////////////////////////////////////////////////////////////////////////////
 
     val lrModel: LogisticRegressionModel = cvModel.bestModel.asInstanceOf[PipelineModel].stages(0).asInstanceOf[LogisticRegressionModel]
-    println("lrModel.getElasticNetParam: " + lrModel.getElasticNetParam)
-    println("lrModel.getRegParam: " + lrModel.getRegParam)
+    println("best ElasticNetParam: " + lrModel.getElasticNetParam)
+    println("best RegParam: " + lrModel.getRegParam)
 
     // Print the coefficients and intercept for multinomial logistic regression
     //    println(s"Coefficients: \n${lrModel.coefficientMatrix}")

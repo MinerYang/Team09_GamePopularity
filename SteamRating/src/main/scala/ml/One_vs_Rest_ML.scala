@@ -21,7 +21,9 @@ case object One_vs_Rest_ML {
 
     // instantiate the base classifier
     val classifier = new LogisticRegression()
-      .setMaxIter(10)
+      .setMaxIter(20)
+      .setRegParam(0.0001)
+      .setElasticNetParam(0.5)
       .setTol(1E-6)
       .setFitIntercept(true)
 
@@ -39,7 +41,32 @@ case object One_vs_Rest_ML {
       .setMetricName("accuracy")
 
     // compute the classification error on test data.
-    val accuracy = evaluator.evaluate(predictions)
-    println(s"Test Error = ${1 - accuracy}")
+    val evaluator1 = new MulticlassClassificationEvaluator()
+      .setLabelCol("label")
+      .setPredictionCol("prediction")
+      .setMetricName("accuracy")
+    val accuracy = evaluator1.evaluate(predictions)
+    println(s"Test set accuracy = $accuracy")
+
+    val evaluator2 = new MulticlassClassificationEvaluator()
+      .setLabelCol("label")
+      .setPredictionCol("prediction")
+      .setMetricName("f1")
+    val f1 = evaluator2.evaluate(predictions)
+    println(s"Test set f1 = $f1")
+
+    val evaluator3 = new MulticlassClassificationEvaluator()
+      .setLabelCol("label")
+      .setPredictionCol("prediction")
+      .setMetricName("weightedPrecision")
+    val weightedPrecision = evaluator3.evaluate(predictions)
+    println(s"Test set weightedPrecision = $weightedPrecision")
+
+    val evaluator4 = new MulticlassClassificationEvaluator()
+      .setLabelCol("label")
+      .setPredictionCol("prediction")
+      .setMetricName("weightedRecall")
+    val weightedRecall = evaluator4.evaluate(predictions)
+    println(s"Test set weightedRecall = $weightedRecall")
   }
 }
