@@ -55,7 +55,6 @@ object Nyb_Realprediction {
     df2.show()
     df2.printSchema()
 
-
     //transform a inputdataframe into a dataframe with features columns
     val prediction = loadmodel.transform(df2)
     prediction.show()
@@ -85,5 +84,4 @@ object Nyb_Realprediction {
                        tags: String,
                        price: Double,
                       )
-
 }
