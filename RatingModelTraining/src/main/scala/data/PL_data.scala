@@ -1,13 +1,11 @@
 package data
 
-import org.apache
-import org.apache.spark
 import org.apache.spark.ml.linalg.Vectors
 import org.apache.spark.sql.functions.{split, udf, when}
-import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
-case object PL_data{
+case object PL_data {
   lazy val appName = "SteamDataCleansing"
   lazy val master = "local[*]"
   lazy val threshold = 0.05
@@ -58,14 +56,17 @@ case object PL_data{
   }
 
   def doubleToVector = udf((ddd: Double) => Vectors.dense(ddd))
-  def cleanData(df:DataFrame): DataFrame = df.na.drop()
+
+  def cleanData(df: DataFrame): DataFrame = df.na.drop()
+
   /**
-   *  pre-chosen and process columns
+   * pre-chosen and process columns
+   *
    * @param df
    * @return DataFrame
    */
-  def preprocess(df:DataFrame) : DataFrame  = {
-    val df1  = processPrice(df)
+  def preprocess(df: DataFrame): DataFrame = {
+    val df1 = processPrice(df)
     val df2 = processRatings(df1)
     parseData(df2)
   }
@@ -77,37 +78,47 @@ case object PL_data{
 
   /**
    * calculate and categorize our label from positive_ratings and negative_ratings
+   *
    * @param df
    * @return
    */
   def processRatings(df: DataFrame): DataFrame = {
-    //TODO: maybe total=0?
-    val t = df("positive_ratings") + df("negative_ratings")
-    val r = df("positive_ratings") / t
-    //    val tMean: Double = df.agg(mean(t)).as("mean").first().getAs[Double](0)
-    //    val tStd: Double = df.agg(stddev(t)).as("std").first().getAs[Double](0)
-    val tMed: Double = {
-      df.withColumn("total", t).createOrReplaceTempView("total")
-      val fewRev = df.sqlContext.sql("SELECT percentile(total, 0.67) FROM total").first().getAs[Double](0)
-      println("if number of ratings is less than {" + fewRev + "} will be considered as FEW REVIEWS")
-      fewRev
-    }
 
-    df.withColumn("positive_ratings", when(t < tMed, 0.0)
-      .when(r >= 0.95, 4.0)
-      .when(r >= 0.7, 3.0)
-      .when(r >= 0.4, 2.0)
-      .otherwise(1.0))
-      .withColumnRenamed("positive_ratings", "ratings")
-      .drop("negative_ratings", "total")
+    df.withColumn("positive_ratings", df("positive_ratings").cast("Decimal"))
+      .withColumn("negative_ratings", df("negative_ratings").cast("Decimal"))
+      .withColumnRenamed("positive_ratings", "p")
+      .withColumnRenamed("negative_ratings", "n")
+      .createOrReplaceTempView("temp")
+    // Lower bound of Wilson score confidence interval for a Bernoulli parameter
+    val rank = df.sqlContext.sql("SELECT appid,name, " +
+      "((p + 1.9208) / (p + n) - 1.96 * SQRT((p * n) / (p + n) + 0.9604) / (p + n)) / (1 + 3.8416 / (p + n)) " +
+      "AS cilb FROM temp WHERE p + n > 0 ")
+    //      + "ORDER BY cilb DESC")
+    //    rank.show()
+
+    rank.createOrReplaceTempView("rank")
+    val percent70: Double = df.sqlContext.sql("SELECT percentile(cilb, 0.70) FROM rank").first().getAs[Double](0)
+    val percent80: Double = df.sqlContext.sql("SELECT percentile(cilb, 0.80) FROM rank").first().getAs[Double](0)
+    val percent90: Double = df.sqlContext.sql("SELECT percentile(cilb, 0.90) FROM rank").first().getAs[Double](0)
+    val percent95: Double = df.sqlContext.sql("SELECT percentile(cilb, 0.95) FROM rank").first().getAs[Double](0)
+    df.createOrReplaceTempView("temp")
+    val dfr = df.sqlContext.sql("SELECT * FROM temp JOIN rank ON temp.appid = rank.appid")
+    dfr.withColumn("ratings", when(dfr("cilb") >= percent95, 4.0)
+      .when(dfr("cilb") >= percent90, 3.0)
+      .when(dfr("cilb") >= percent80, 2.0)
+      .when(dfr("cilb") >= percent70, 1.0)
+      .otherwise(0.0))
+      .drop("positive_ratings", "negative_ratings", "cilb")
   }
 
+
   /**
-   *  parse some columns
+   * parse some columns
+   *
    * @param df
    * @return DataFrame
    */
-  def parseData(df:DataFrame) :DataFrame = df
+  def parseData(df: DataFrame): DataFrame = df
     .withColumn("developer", split(df("developer"), ";"))
     .withColumn("publisher", split(df("publisher"), ";"))
     .withColumn("platforms", split(df("platforms"), ";"))
@@ -116,7 +127,6 @@ case object PL_data{
     .withColumnRenamed("steamspy_tags", "tags")
     .drop("name", "release_date", "english", "achievements", "genres",
       "required_age", "average_playtime", "median_playtime", "owners")
-
 
 
 }
