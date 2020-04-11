@@ -2,6 +2,7 @@ package app
 
 import ML._
 import org.apache.spark.ml.Pipeline
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.ml.feature.{ChiSqSelector, CountVectorizer, MinMaxScaler, VectorAssembler}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -87,11 +88,39 @@ object Stages_constructor {
     val nbMl = nb(fsdf)
 
     //TODO: accuray examine???
+//    val predictions = ???.transform(origindf)
+//
+//    //     Select (prediction, true label) and compute test error
+//    val evaluator1 = new MulticlassClassificationEvaluator()
+//      .setLabelCol("label")
+//      .setPredictionCol("prediction")
+//      .setMetricName("accuracy")
+//    val accuracy = evaluator1.evaluate(predictions)
+//    println(s"Test set accuracy = $accuracy")
+//
+//    val evaluator2 = new MulticlassClassificationEvaluator()
+//      .setLabelCol("label")
+//      .setPredictionCol("prediction")
+//      .setMetricName("f1")
+//    val f1 = evaluator2.evaluate(predictions)
+//    println(s"Test set f1 = $f1")
+//
+//    val evaluator3 = new MulticlassClassificationEvaluator()
+//      .setLabelCol("label")
+//      .setPredictionCol("prediction")
+//      .setMetricName("weightedPrecision")
+//    val weightedPrecision = evaluator3.evaluate(predictions)
+//    println(s"Test set weightedPrecision = $weightedPrecision")
+//
+//    val evaluator4 = new MulticlassClassificationEvaluator()
+//      .setLabelCol("label")
+//      .setPredictionCol("prediction")
+//      .setMetricName("weightedRecall")
+//    val weightedRecall = evaluator4.evaluate(predictions)
+//    println(s"Test set weightedRecall = $weightedRecall")
 
-    //    val rf = new RandomForestClassifier()
-    //      .setLabelCol("ratings")
-    //      .setFeaturesCol("features")
-    //      .setSeed(seed)
+
+    
 
     // construct stages with transformers ,estimator
     val stages = Array(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, fs, lrMl, rfMl, mlpMl, nbMl)
