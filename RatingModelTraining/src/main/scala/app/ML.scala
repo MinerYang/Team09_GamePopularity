@@ -41,24 +41,6 @@ object ML {
     lrModel
   }
 
-  def ovr(data: DataFrame): OneVsRestModel = {
-    // instantiate the base classifier
-    val classifier = new LogisticRegression()
-      .setMaxIter(20)
-      .setRegParam(0.0001)
-      .setElasticNetParam(0.5)
-      .setTol(1E-6)
-      .setFitIntercept(true)
-
-    // instantiate the One Vs Rest Classifier.
-    val ovr = new OneVsRest().setClassifier(classifier)
-
-    // train the multiclass model.
-    val ovrModel = ovr.fit(data)
-    println("[ovrModel] best para: using result from lr model" )
-    ovrModel
-  }
-
   def rf(data: DataFrame): RandomForestClassificationModel = {
     // Train a RandomForest model.
     val rf = new RandomForestClassifier()

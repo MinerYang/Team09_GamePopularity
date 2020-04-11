@@ -82,7 +82,6 @@ object Stages_constructor {
     //construct estimator
     /*  5 models*/
     val lrMl = lr(fsdf)
-    val ovrMl = ovr(fsdf)
     val rfMl = rf(fsdf)
     val mlpMl = mlp(fsdf)
     val nbMl = nb(fsdf)
@@ -94,7 +93,7 @@ object Stages_constructor {
     //      .setSeed(seed)
 
     // construct stages with transformers ,estimator
-    val stages = Array(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, fs, lrMl, ovrMl, rfMl, mlpMl, nbMl)
+    val stages = Array(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, fs, lrMl, rfMl, mlpMl, nbMl)
 
     //construct pipeline
     val pipeline = new Pipeline()
