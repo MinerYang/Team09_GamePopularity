@@ -32,9 +32,8 @@ object ML {
       .setEstimatorParamMaps(paramGrid)
       .setNumFolds(5) // Use 3+ in practice
       .setParallelism(2) // Evaluate up to 2 parameter settings in parallel
-
     // Run cross-validation, and choose the best set of parameters.
-    val cvModel = cv.fit(data)
+    val cvModel = cv.fit(data.withColumnRenamed("ratings", "label"))
     val lrModel: LogisticRegressionModel = cvModel.bestModel.asInstanceOf[PipelineModel].stages(0).asInstanceOf[LogisticRegressionModel]
     println("[lrModel] best ElasticNetParam: " + lrModel.getElasticNetParam)
     println("[lrModel] best RegParam: " + lrModel.getRegParam)
@@ -63,7 +62,7 @@ object ML {
       .setEvaluator(new MulticlassClassificationEvaluator)
       .setParallelism(2)
 
-    val m = crossValidator.fit(data)
+    val m = crossValidator.fit(data.withColumnRenamed("ratings", "label"))
     val bm = m.bestModel.asInstanceOf[PipelineModel]
     val rfModel = bm.stages(0).asInstanceOf[RandomForestClassificationModel]
     println("[rfModel] best accuracy: " + m.avgMetrics.max + ", with num of trees: " + rfModel.getNumTrees + ", with max depth: " + rfModel.getMaxDepth)
@@ -88,7 +87,7 @@ object ML {
       .setEvaluator(new MulticlassClassificationEvaluator)
       .setParallelism(2)
 
-    val m = crossValidator.fit(data)
+    val m = crossValidator.fit(data.withColumnRenamed("ratings", "label"))
     val bm = m.bestModel.asInstanceOf[PipelineModel]
     val mlpModel = bm.stages(0).asInstanceOf[MultilayerPerceptronClassificationModel]
     println("[mlpModel] best accuracy: " + m.avgMetrics.max + ", with hidden layer setting: " + mlpModel.layers(1))
@@ -110,7 +109,7 @@ object ML {
       .setEvaluator(new MulticlassClassificationEvaluator)
       .setParallelism(2)
 
-    val m = crossValidator.fit(data)
+    val m = crossValidator.fit(data.withColumnRenamed("ratings", "label"))
     val bm = m.bestModel.asInstanceOf[PipelineModel]
     val nbModel = bm.stages(0).asInstanceOf[NaiveBayesModel]
     println("[nbModel] best accuracy: " + m.avgMetrics.max + ", with smoothing para: " + nbModel.getSmoothing)

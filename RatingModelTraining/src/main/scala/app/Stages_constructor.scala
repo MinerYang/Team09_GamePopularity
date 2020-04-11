@@ -1,9 +1,10 @@
 package app
 
-import ML._
+import app.ML._
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
-import org.apache.spark.ml.feature.{ChiSqSelector, CountVectorizer, MinMaxScaler, VectorAssembler}
+import org.apache.spark.ml.feature._
+import org.apache.spark.ml.linalg.Vector
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 
@@ -15,6 +16,7 @@ object Stages_constructor {
   def main(args: Array[String]): Unit = {
     val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
     ss.sparkContext.setLogLevel("WARN")
+    import ss.implicits._
 
     // import cleaned and preprocessed dataset
     val path = "hdfs://localhost:9000/CSYE7200TEST/predata2"
@@ -88,7 +90,7 @@ object Stages_constructor {
       val mlpMl = mlp(fsdf)
       val nbMl = nb(fsdf)
       val candidate = List(lrMl, rfMl, mlpMl, nbMl)
-      val accs = for (m <- candidate) yield{
+      val accs = for (m <- candidate) yield {
         val predictions = m.transform(fsdf)
 
         //     Select (prediction, true label) and compute test error
@@ -100,7 +102,7 @@ object Stages_constructor {
         println(s"Test set accuracy = $accuracy")
         accuracy
       }
-      val selected:Int = accs.zipWithIndex.maxBy(_._1)._2
+      val selected: Int = accs.zipWithIndex.maxBy(_._1)._2
       candidate(selected)
     }
 
