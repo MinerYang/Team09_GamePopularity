@@ -18,17 +18,17 @@ case object LogisticML {
     val training = ss.read.format("libsvm")
       .load("hdfs://localhost:9000/CSYE7200/steam-data-for-ml")
 
-    val lr1 = new LogisticRegression()
+    val lr = new LogisticRegression()
       .setMaxIter(20)
     val pipeline = new Pipeline()
-      .setStages(Array(lr1))
+      .setStages(Array(lr))
 
     // We use a ParamGridBuilder to construct a grid of parameters to search over.
     // With 3 values for hashingTF.numFeatures and 2 values for lr.regParam,
     // this grid will have 3 x 2 = 6 parameter settings for CrossValidator to choose from.
     val paramGrid = new ParamGridBuilder()
-      .addGrid(lr1.regParam, Array(0.1, 0.01, 0.001, 0.0001))
-      .addGrid(lr1.elasticNetParam, Array(0.2, 0.5, 0.8))
+      .addGrid(lr.regParam, Array(0.1, 0.01, 0.001, 0.0001))
+      .addGrid(lr.elasticNetParam, Array(0.2, 0.5, 0.8))
       .build()
 
     // We now treat the Pipeline as an Estimator, wrapping it in a CrossValidator instance.
@@ -48,18 +48,20 @@ case object LogisticML {
 
     ////////////////////////////////////////////////////////////////////////////////
 
-    val lrModel:LogisticRegressionModel = cvModel.bestModel.asInstanceOf[PipelineModel].stages(0).asInstanceOf[LogisticRegressionModel]
+    val lrModel: LogisticRegressionModel = cvModel.bestModel.asInstanceOf[PipelineModel].stages(0).asInstanceOf[LogisticRegressionModel]
+    println("lrModel.getElasticNetParam: " + lrModel.getElasticNetParam)
+    println("lrModel.getRegParam: " + lrModel.getRegParam)
 
     // Print the coefficients and intercept for multinomial logistic regression
-    println(s"Coefficients: \n${lrModel.coefficientMatrix}")
-    println(s"Intercepts: \n${lrModel.interceptVector}")
+    //    println(s"Coefficients: \n${lrModel.coefficientMatrix}")
+    //    println(s"Intercepts: \n${lrModel.interceptVector}")
 
     val trainingSummary = lrModel.summary
 
     // Obtain the objective per iteration
-    val objectiveHistory = trainingSummary.objectiveHistory
-    println("objectiveHistory:")
-    objectiveHistory.foreach(println)
+    //    val objectiveHistory = trainingSummary.objectiveHistory
+    //    println("objectiveHistory:")
+    //    objectiveHistory.foreach(println)
 
     // for multiclass, we can inspect metrics on a per-label basis
     println("False positive rate by label:")
