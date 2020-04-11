@@ -86,6 +86,7 @@ object Stages_constructor {
     val mlpMl = mlp(fsdf)
     val nbMl = nb(fsdf)
 
+    //TODO: accuray examine???
 
     //    val rf = new RandomForestClassifier()
     //      .setLabelCol("ratings")
@@ -103,7 +104,7 @@ object Stages_constructor {
     //    val Array(pltrainingSet, pltestSet) = origindf.randomSplit(Array[Double](0.7, 0.3), 7777L)
     val pipelineModel = pipeline.fit(origindf)
 
-    // accuray examine
+
 
     /**
      * save model locally
