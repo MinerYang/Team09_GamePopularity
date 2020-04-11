@@ -13,7 +13,7 @@ object Nyb_Realprediction {
     val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
     ss.sparkContext.setLogLevel("WARN")
     // Load data
-    val loadmodel = PipelineModel.load("/Users/mineryang/Documents/Team09_GamePopularity-JiaaoYu-working/RatingModelTraining/nbymodel1")
+    val loadmodel = PipelineModel.load("/Users/mineryang/Documents/Team09_GamePopularity-JiaaoYu-working/RatingModelTraining/selected_model")
 
     //construct user input
     /**

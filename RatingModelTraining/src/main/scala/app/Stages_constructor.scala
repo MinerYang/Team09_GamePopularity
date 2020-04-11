@@ -1,8 +1,7 @@
 package app
 
+import ML._
 import org.apache.spark.ml.Pipeline
-import org.apache.spark.ml.classification.NaiveBayes
-import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.ml.feature.{ChiSqSelector, CountVectorizer, MinMaxScaler, VectorAssembler}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -81,11 +80,13 @@ object Stages_constructor {
     ////    stagesCollector.productIterator.foreach{ i =>println(i.toString)}
 
     //construct estimator
-    /*  NaiveBayes model*/
-    val seed = 7777L
-    val nby = new NaiveBayes()
-      .setFeaturesCol("features")
-      .setLabelCol("ratings")
+    /*  5 models*/
+    val lrMl = lr(fsdf)
+    val ovrMl = ovr(fsdf)
+    val rfMl = rf(fsdf)
+    val mlpMl = mlp(fsdf)
+    val nbMl = nb(fsdf)
+
 
     //    val rf = new RandomForestClassifier()
     //      .setLabelCol("ratings")
@@ -93,34 +94,23 @@ object Stages_constructor {
     //      .setSeed(seed)
 
     // construct stages with transformers ,estimator
-    val stages = Array(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, fs, nby)
+    val stages = Array(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, fs, lrMl, ovrMl, rfMl, mlpMl, nbMl)
 
     //construct pipeline
     val pipeline = new Pipeline()
       .setStages(stages)
 
     //model traning
-    val Array(pltrainingSet, pltestSet) = origindf.randomSplit(Array[Double](0.7, 0.3), seed)
-    val pipelineModel = pipeline.fit(pltrainingSet)
+    //    val Array(pltrainingSet, pltestSet) = origindf.randomSplit(Array[Double](0.7, 0.3), 7777L)
+    val pipelineModel = pipeline.fit(origindf)
+
+    // accuray examine
+
     /**
      * save model locally
      */
-    var exportpath = s"/Users/mineryang/Documents/Team09_GamePopularity-JiaaoYu-working/RatingModelTraining/nbymodel1"
+    var exportpath = s"/Users/mineryang/Documents/Team09_GamePopularity-JiaaoYu-working/RatingModelTraining/selected_model"
     pipelineModel.write.overwrite().save(exportpath)
-
-
-    val pipelinePredictionDf = pipelineModel.transform(pltestSet)
-    println("prediction DF")
-    pipelinePredictionDf.show(5)
-
-    // accuray examine
-    val evaluator1 = new MulticlassClassificationEvaluator()
-      .setLabelCol("ratings")
-      .setPredictionCol("prediction")
-      .setMetricName("accuracy")
-    val accuracy = evaluator1.evaluate(pipelinePredictionDf)
-    println(s"Test set accuracy = $accuracy")
-
 
   }
 
