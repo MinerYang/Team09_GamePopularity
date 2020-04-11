@@ -40,7 +40,7 @@ case object PL_data {
       .option("header", "true")
       .schema(schema)
       .option("dateFormat", "m/d/YYYY")
-      .csv("/Users/mineryang/Desktop/Team09_GamePopularity-JiaaoYu-working/SteamRating/steam.csv")
+      .csv("hdfs://localhost:9000/CSYE7200TEST/steam.csv")
     df.show()
 
     val df_clean = cleanData(df)
@@ -49,7 +49,7 @@ case object PL_data {
     df_pre.printSchema()
 
     //save clean dataset
-    val path = "/Users/mineryang/Documents/Team09_GamePopularity-JiaaoYu-working/RatingModelTraining/predata2.parquet"
+    val path = "hdfs://localhost:9000/CSYE7200TEST/predata2"
     df_pre.write.parquet(path)
     val parquetFileDF = ss.read.parquet(path)
     parquetFileDF.show(5)

@@ -17,7 +17,7 @@ object Stages_constructor {
     ss.sparkContext.setLogLevel("WARN")
 
     // import cleaned and preprocessed dataset
-    val path = "/Users/mineryang/Documents/Team09_GamePopularity-JiaaoYu-working/RatingModelTraining/predata2.parquet"
+    val path = "hdfs://localhost:9000/CSYE7200TEST/predata2"
     val origindf: DataFrame = ss.read.parquet(path)
     origindf.show(5)
     origindf.printSchema()
@@ -89,7 +89,7 @@ object Stages_constructor {
       val nbMl = nb(fsdf)
       val candidate = List(lrMl, rfMl, mlpMl, nbMl)
       val accs = for (m <- candidate) yield{
-        val predictions = m.transform(origindf)
+        val predictions = m.transform(fsdf)
 
         //     Select (prediction, true label) and compute test error
         val evaluator = new MulticlassClassificationEvaluator()
@@ -118,7 +118,7 @@ object Stages_constructor {
     /**
      * save model locally
      */
-    val exportpath = s"/Users/mineryang/Documents/Team09_GamePopularity-JiaaoYu-working/RatingModelTraining/selected_model"
+    val exportpath = s"hdfs://localhost:9000/CSYE7200TEST/selected_model"
     pipelineModel.write.overwrite().save(exportpath)
   }
 
