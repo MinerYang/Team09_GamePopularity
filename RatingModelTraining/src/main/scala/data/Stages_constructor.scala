@@ -1,14 +1,10 @@
 package data
 
-import com.sun.xml.internal.bind.v2.TODO
 import org.apache.spark.ml.Pipeline
-import org.apache.spark.ml.classification.{MultilayerPerceptronClassifier, NaiveBayes, RandomForestClassifier}
+import org.apache.spark.ml.classification.NaiveBayes
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
-import org.apache.spark.ml.feature.{ChiSqSelector, ChiSqSelectorModel, CountVectorizer, CountVectorizerModel, MinMaxScaler, MinMaxScalerModel, VectorAssembler}
-import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
+import org.apache.spark.ml.feature.{ChiSqSelector, CountVectorizer, MinMaxScaler, VectorAssembler}
 import org.apache.spark.sql.{DataFrame, SparkSession}
-
-import scala.collection.mutable.ArrayBuffer
 
 
 object Stages_constructor {
@@ -27,64 +23,62 @@ object Stages_constructor {
     origindf.printSchema()
 
 
-
-
     // start build pipeline
     val target = "ratings"
 
     //for price
     val t1 = minMaxScaler("price")
-    val df1:DataFrame = t1.fit(origindf).transform(origindf)
-    val t2 = chiSqSelector("fpr","price_features",target, threshold)
-    val df2:DataFrame = t2.fit(df1).transform(df1)
+    val df1: DataFrame = t1.fit(origindf).transform(origindf)
+    val t2 = chiSqSelector("fpr", "price_features", target, threshold)
+    val df2: DataFrame = t2.fit(df1).transform(df1)
     println("DF2")
     df2.printSchema()
 
     //for Platform, Categories, Tags, Developer, Publisher
     val t3 = countVectorize("platforms")
-    val df3:DataFrame = t3.fit(df2).transform(df2)
+    val df3: DataFrame = t3.fit(df2).transform(df2)
     println("DF3")
     df3.printSchema()
-    val t4 = chiSqSelector("fdr","platforms_features",target,threshold)
-    val df4:DataFrame = t4.fit(df3).transform(df3)
+    val t4 = chiSqSelector("fdr", "platforms_features", target, threshold)
+    val df4: DataFrame = t4.fit(df3).transform(df3)
     println("DF4")
     df4.printSchema()
 
     val t5 = countVectorize("categories")
-    val df5:DataFrame = t5.fit(df4).transform(df4)
+    val df5: DataFrame = t5.fit(df4).transform(df4)
     println("DF5")
     df5.printSchema()
-    val t6 = chiSqSelector("fdr","categories_features",target,threshold)
-    val df6:DataFrame = t6.fit(df5).transform(df5)
+    val t6 = chiSqSelector("fdr", "categories_features", target, threshold)
+    val df6: DataFrame = t6.fit(df5).transform(df5)
     println("DF6")
     df6.printSchema()
 
     val t7 = countVectorize("tags")
-    val df7:DataFrame = t7.fit(df6).transform(df6)
-    val t8 = chiSqSelector("fdr","tags_features",target,threshold)
-    val df8:DataFrame = t8.fit(df7).transform(df7)
+    val df7: DataFrame = t7.fit(df6).transform(df6)
+    val t8 = chiSqSelector("fdr", "tags_features", target, threshold)
+    val df8: DataFrame = t8.fit(df7).transform(df7)
 
     val t9 = countVectorize("developer")
-    val df9:DataFrame = t9.fit(df8).transform(df8)
-    val t10 = chiSqSelector("fdr","developer_features",target,threshold)
-    val df10:DataFrame = t10.fit(df9).transform(df9)
+    val df9: DataFrame = t9.fit(df8).transform(df8)
+    val t10 = chiSqSelector("fdr", "developer_features", target, threshold)
+    val df10: DataFrame = t10.fit(df9).transform(df9)
 
     val t11 = countVectorize("publisher")
-    val df11:DataFrame = t11.fit(df10).transform(df10)
-    val t12 = chiSqSelector("fdr","publisher_features",target,threshold)
-    val df12:DataFrame = t12.fit(df11).transform(df11)
+    val df11: DataFrame = t11.fit(df10).transform(df10)
+    val t12 = chiSqSelector("fdr", "publisher_features", target, threshold)
+    val df12: DataFrame = t12.fit(df11).transform(df11)
     println("DF12")
     df12.show()
     df12.printSchema()
 
     // for features
     val fs = featuresAssemb
-    val fsdf:DataFrame = fs.transform(df12)
+    val fsdf: DataFrame = fs.transform(df12)
     println("fs_DF")
     fsdf.show()
     fsdf.printSchema()
 
-////    stagesCollector.productIterator.foreach{ i =>println(i.toString)}
+    ////    stagesCollector.productIterator.foreach{ i =>println(i.toString)}
 
     //construct estimator
     /*  NaiveBayes model*/
@@ -93,13 +87,13 @@ object Stages_constructor {
       .setFeaturesCol("features")
       .setLabelCol("ratings")
 
-//    val rf = new RandomForestClassifier()
-//      .setLabelCol("ratings")
-//      .setFeaturesCol("features")
-//      .setSeed(seed)
+    //    val rf = new RandomForestClassifier()
+    //      .setLabelCol("ratings")
+    //      .setFeaturesCol("features")
+    //      .setSeed(seed)
 
     // construct stages with transformers ,estimator
-    val stages = Array(t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,fs,nby)
+    val stages = Array(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, fs, nby)
 
     //construct pipeline
     val pipeline = new Pipeline()
@@ -121,27 +115,27 @@ object Stages_constructor {
 
     // accuray examine
     val evaluator1 = new MulticlassClassificationEvaluator()
-          .setLabelCol("ratings")
-          .setPredictionCol("prediction")
-          .setMetricName("accuracy")
-        val accuracy = evaluator1.evaluate(pipelinePredictionDf)
-        println(s"Test set accuracy = $accuracy")
+      .setLabelCol("ratings")
+      .setPredictionCol("prediction")
+      .setMetricName("accuracy")
+    val accuracy = evaluator1.evaluate(pipelinePredictionDf)
+    println(s"Test set accuracy = $accuracy")
 
 
   }
 
 
-  def minMaxScaler(colName: String): MinMaxScaler ={
-    println("*** init a MinMaxScaler with column"+colName)
+  def minMaxScaler(colName: String): MinMaxScaler = {
+    println("*** init a MinMaxScaler with column" + colName)
     val scaler = new MinMaxScaler()
       .setInputCol(colName)
       .setOutputCol(colName + "_features")
     scaler
   }
 
-  def chiSqSelector(stype:String, colName: String, target: String, para: Double):ChiSqSelector  = {
-    println("*** init a ChiSqSelector type:"+stype+ " with column: "+colName)
-    if(stype.equals("fpr")){
+  def chiSqSelector(stype: String, colName: String, target: String, para: Double): ChiSqSelector = {
+    println("*** init a ChiSqSelector type:" + stype + " with column: " + colName)
+    if (stype.equals("fpr")) {
       val selector = new ChiSqSelector()
         .setSelectorType("fpr")
         .setFpr(para)
@@ -150,7 +144,7 @@ object Stages_constructor {
         .setOutputCol("selected_" + colName)
       return selector
     }
-    else if (stype.equals("fdr")){
+    else if (stype.equals("fdr")) {
       val selector = new ChiSqSelector()
         .setSelectorType("fdr")
         .setFdr(para)
@@ -164,8 +158,8 @@ object Stages_constructor {
     selector
   }
 
-  def countVectorize(colName:String):CountVectorizer = {
-    println("*** init a CountVectorizer with column: "+colName)
+  def countVectorize(colName: String): CountVectorizer = {
+    println("*** init a CountVectorizer with column: " + colName)
     val cv = new CountVectorizer()
       .setInputCol(colName)
       .setOutputCol(colName + "_features")
@@ -173,7 +167,7 @@ object Stages_constructor {
     cv
   }
 
-  def featuresAssemb : VectorAssembler = {
+  def featuresAssemb: VectorAssembler = {
     println("*** init a VectorAssembler")
     val featureCol = Array(
       "selected_price_features",
@@ -190,42 +184,41 @@ object Stages_constructor {
   }
 
 
-  def stagesCollector():Tuple13[
-    MinMaxScaler,ChiSqSelector,
-    CountVectorizer,ChiSqSelector,
-    CountVectorizer,ChiSqSelector,
-    CountVectorizer,ChiSqSelector,
-    CountVectorizer,ChiSqSelector,
-    CountVectorizer,ChiSqSelector,
-    VectorAssembler] =
-  {
+  def stagesCollector(): Tuple13[
+    MinMaxScaler, ChiSqSelector,
+    CountVectorizer, ChiSqSelector,
+    CountVectorizer, ChiSqSelector,
+    CountVectorizer, ChiSqSelector,
+    CountVectorizer, ChiSqSelector,
+    CountVectorizer, ChiSqSelector,
+    VectorAssembler] = {
     val target = "ratings"
 
     //for price
     val t1 = minMaxScaler("price")
-    val t2 = chiSqSelector("fpr","price",target, threshold)
+    val t2 = chiSqSelector("fpr", "price", target, threshold)
 
     //for Platform, Categories, Tags, Developer, Publisher
     val t3 = countVectorize("platforms")
-    val t4 = chiSqSelector("fdr","platforms",target,threshold)
+    val t4 = chiSqSelector("fdr", "platforms", target, threshold)
 
     val t5 = countVectorize("categories")
-    val t6 = chiSqSelector("fdr","categories",target,threshold)
+    val t6 = chiSqSelector("fdr", "categories", target, threshold)
 
     val t7 = countVectorize("tags")
-    val t8 = chiSqSelector("fdr","tags",target,threshold)
+    val t8 = chiSqSelector("fdr", "tags", target, threshold)
 
     val t9 = countVectorize("developer")
-    val t10 = chiSqSelector("fdr","developer",target,threshold)
+    val t10 = chiSqSelector("fdr", "developer", target, threshold)
 
     val t11 = countVectorize("publisher")
-    val t12 = chiSqSelector("fdr","publisher",target,threshold)
+    val t12 = chiSqSelector("fdr", "publisher", target, threshold)
 
     // for features
     val fs = featuresAssemb
 
     //contruct tuple
-    val tp = (t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,fs)
+    val tp = (t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, fs)
     tp
   }
 
