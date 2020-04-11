@@ -85,6 +85,7 @@ object Stages_constructor {
     //construct estimator
     /*  4 models*/
     val ml = {
+      println("*** init meachine learning models")
       val lrMl = lr(fsdf)
       val rfMl = rf(fsdf)
       val mlpMl = mlp(fsdf)
@@ -99,10 +100,11 @@ object Stages_constructor {
           .setPredictionCol("prediction")
           .setMetricName("accuracy")
         val accuracy = evaluator.evaluate(predictions)
-        println(s"Test set accuracy = $accuracy")
+        println(s"Accuracy = $accuracy")
         accuracy
       }
       val selected: Int = accs.zipWithIndex.maxBy(_._1)._2
+      println("*** best model selected")
       candidate(selected)
     }
 
