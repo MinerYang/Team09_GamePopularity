@@ -108,7 +108,7 @@ case object PL_data {
       .when(dfr("cilb") >= percent80, 2.0)
       .when(dfr("cilb") >= percent70, 1.0)
       .otherwise(0.0))
-      .drop("positive_ratings", "negative_ratings", "cilb")
+      .drop("positive_ratings", "negative_ratings", "cilb","appid")
   }
 
 
