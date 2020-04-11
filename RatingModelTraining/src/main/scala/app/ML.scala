@@ -2,12 +2,12 @@ package app
 
 import org.apache.spark.ml.classification._
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
-import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder}
+import org.apache.spark.ml.tuning.{CrossValidator, CrossValidatorModel, ParamGridBuilder}
 import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.sql._
 
 object ML {
-  def lr(data: DataFrame): LogisticRegressionModel = {
+  def lr(data: DataFrame): CrossValidatorModel = {
     val lr = new LogisticRegression()
       .setMaxIter(20)
     val pipeline = new Pipeline()
@@ -38,28 +38,10 @@ object ML {
     val lrModel: LogisticRegressionModel = cvModel.bestModel.asInstanceOf[PipelineModel].stages(0).asInstanceOf[LogisticRegressionModel]
     println("[lrModel] best ElasticNetParam: " + lrModel.getElasticNetParam)
     println("[lrModel] best RegParam: " + lrModel.getRegParam)
-    lrModel
+    cvModel
   }
 
-  def ovr(data: DataFrame): OneVsRestModel = {
-    // instantiate the base classifier
-    val classifier = new LogisticRegression()
-      .setMaxIter(20)
-      .setRegParam(0.0001)
-      .setElasticNetParam(0.5)
-      .setTol(1E-6)
-      .setFitIntercept(true)
-
-    // instantiate the One Vs Rest Classifier.
-    val ovr = new OneVsRest().setClassifier(classifier)
-
-    // train the multiclass model.
-    val ovrModel = ovr.fit(data)
-    println("[ovrModel] best para: using result from lr model" )
-    ovrModel
-  }
-
-  def rf(data: DataFrame): RandomForestClassificationModel = {
+  def rf(data: DataFrame): CrossValidatorModel = {
     // Train a RandomForest model.
     val rf = new RandomForestClassifier()
 
@@ -85,10 +67,10 @@ object ML {
     val bm = m.bestModel.asInstanceOf[PipelineModel]
     val rfModel = bm.stages(0).asInstanceOf[RandomForestClassificationModel]
     println("[rfModel] best accuracy: " + m.avgMetrics.max + ", with num of trees: " + rfModel.getNumTrees + ", with max depth: " + rfModel.getMaxDepth)
-    rfModel
+    m
   }
 
-  def mlp(data: DataFrame): MultilayerPerceptronClassificationModel = {
+  def mlp(data: DataFrame): CrossValidatorModel = {
     // create the trainer and set its parameters
     val mlp = new MultilayerPerceptronClassifier()
       .setBlockSize(128)
@@ -110,10 +92,10 @@ object ML {
     val bm = m.bestModel.asInstanceOf[PipelineModel]
     val mlpModel = bm.stages(0).asInstanceOf[MultilayerPerceptronClassificationModel]
     println("[mlpModel] best accuracy: " + m.avgMetrics.max + ", with hidden layer setting: " + mlpModel.layers(1))
-    mlpModel
+    m
   }
 
-  def nb(data: DataFrame): NaiveBayesModel = {
+  def nb(data: DataFrame): CrossValidatorModel = {
     val nb = new NaiveBayes()
 
     val pipeline = new Pipeline().setStages(Array(nb))
@@ -132,6 +114,6 @@ object ML {
     val bm = m.bestModel.asInstanceOf[PipelineModel]
     val nbModel = bm.stages(0).asInstanceOf[NaiveBayesModel]
     println("[nbModel] best accuracy: " + m.avgMetrics.max + ", with smoothing para: " + nbModel.getSmoothing)
-    nbModel
+    m
   }
 }
