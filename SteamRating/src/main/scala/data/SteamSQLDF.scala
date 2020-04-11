@@ -6,6 +6,8 @@ import org.apache.spark.ml.linalg.{Vector, Vectors}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{StructField, _}
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import Schema.GameSchema
+
 
 case object SteamSQLDF {
   lazy val appName = "SteamDataCleansing"
@@ -19,30 +21,30 @@ case object SteamSQLDF {
 
     //appid	name	release_date	english	developer	publisher	platforms	required_age	categories
     //genres	steamspy_tags	achievements	positive_ratings	negative_ratings	average_playtime	median_playtime	owners	price
-    val schema = new StructType(Array(
-      StructField("appid", DataTypes.IntegerType),
-      StructField("name", DataTypes.StringType),
-      StructField("release_date", DataTypes.DateType),
-      StructField("english", DataTypes.IntegerType),
-      StructField("developer", DataTypes.StringType),
-      StructField("publisher", DataTypes.StringType),
-      StructField("platforms", DataTypes.StringType),
-      StructField("required_age", DataTypes.IntegerType),
-      StructField("categories", DataTypes.StringType),
-      StructField("genres", DataTypes.StringType),
-      StructField("steamspy_tags", DataTypes.StringType),
-      StructField("achievements", DataTypes.IntegerType),
-      StructField("positive_ratings", DataTypes.IntegerType),
-      StructField("negative_ratings", DataTypes.IntegerType),
-      StructField("average_playtime", DataTypes.IntegerType),
-      StructField("median_playtime", DataTypes.IntegerType),
-      StructField("owners", DataTypes.StringType),
-      StructField("price", DataTypes.DoubleType),
-    ))
+//    val schema = new StructType(Array(
+//      StructField("appid", DataTypes.IntegerType),
+//      StructField("name", DataTypes.StringType),
+//      StructField("release_date", DataTypes.DateType),
+//      StructField("english", DataTypes.IntegerType),
+//      StructField("developer", DataTypes.StringType),
+//      StructField("publisher", DataTypes.StringType),
+//      StructField("platforms", DataTypes.StringType),
+//      StructField("required_age", DataTypes.IntegerType),
+//      StructField("categories", DataTypes.StringType),
+//      StructField("genres", DataTypes.StringType),
+//      StructField("steamspy_tags", DataTypes.StringType),
+//      StructField("achievements", DataTypes.IntegerType),
+//      StructField("positive_ratings", DataTypes.IntegerType),
+//      StructField("negative_ratings", DataTypes.IntegerType),
+//      StructField("average_playtime", DataTypes.IntegerType),
+//      StructField("median_playtime", DataTypes.IntegerType),
+//      StructField("owners", DataTypes.StringType),
+//      StructField("price", DataTypes.DoubleType),
+//    ))
     //      .format("com.databricks.spark.csv")
     val df: DataFrame = ss.read.format("org.apache.spark.csv")
       .option("header", "true")
-      .schema(schema)
+      .schema(GameSchema.schema)
       .option("dateFormat", "m/d/YYYY")
       .csv("./steam.csv")
       //.csv("hdfs://localhost:9000/CSYE7200/steam.csv")
@@ -82,7 +84,7 @@ case object SteamSQLDF {
 //      new java.net.URI("hdfs://localhost:9000"), new org.apatput, true)
     //   // labeled.write.format("libsvm").save("hdche.hadoop.conf.Configuration())
 //    if (hdfs.exists(output)) hdfs.delete(oufs://localhost:9000/CSYE7200/steam-data-for-ml")
-      labeled.write.format("libsvm").save("D:/Idea Proj/Team09_GamePopularity/steam-data-ml")
+      labeled.write.format("libsvm").save("D:/Idea Proj/Team09_GamePopularity/steamRating/steam-data-ml")
     ss.stop()
   }
 
