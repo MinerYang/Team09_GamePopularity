@@ -92,7 +92,7 @@ object Stages_constructor {
       val nbMl = nb(fsdf)
       val candidate = List(lrMl, rfMl, mlpMl, nbMl)
       val accs = for (m <- candidate) yield {
-        val predictions = m.transform(fsdf)
+        val predictions = m.transform(fsdf.withColumnRenamed("ratings", "label"))
 
         //     Select (prediction, true label) and compute test error
         val evaluator = new MulticlassClassificationEvaluator()

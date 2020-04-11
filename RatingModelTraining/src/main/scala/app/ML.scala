@@ -2,9 +2,11 @@ package app
 
 import org.apache.spark.ml.classification._
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+import org.apache.spark.ml.linalg.Vector
 import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder}
 import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.sql._
+import org.apache.spark.sql.functions.udf
 
 object ML {
   def lr(data: DataFrame): LogisticRegressionModel = {
@@ -35,8 +37,8 @@ object ML {
     // Run cross-validation, and choose the best set of parameters.
     val cvModel = cv.fit(data.withColumnRenamed("ratings", "label"))
     val lrModel: LogisticRegressionModel = cvModel.bestModel.asInstanceOf[PipelineModel].stages(0).asInstanceOf[LogisticRegressionModel]
-    println("[lrModel] best ElasticNetParam: " + lrModel.getElasticNetParam)
-    println("[lrModel] best RegParam: " + lrModel.getRegParam)
+    println("[lrModel] best accuracy: " + cvModel.avgMetrics.max)
+    println("[lrModel] best ElasticNetParam: " + lrModel.getElasticNetParam + ", best RegParam: " + lrModel.getRegParam)
     lrModel
   }
 
@@ -62,10 +64,10 @@ object ML {
       .setEvaluator(new MulticlassClassificationEvaluator)
       .setParallelism(2)
 
-    val m = crossValidator.fit(data.withColumnRenamed("ratings", "label"))
+    val m = crossValidator.fit(data.withColumnRenamed("ratings", "label").withColumn("features", sparseToDense(data("features"))))
     val bm = m.bestModel.asInstanceOf[PipelineModel]
     val rfModel = bm.stages(0).asInstanceOf[RandomForestClassificationModel]
-    println("[rfModel] best accuracy: " + m.avgMetrics.max + ", with num of trees: " + rfModel.getNumTrees + ", with max depth: " + rfModel.getMaxDepth)
+    println("[rfModel] best accuracy: " + m.avgMetrics.max + ", with num of trees: " + rfModel.getNumTrees + ", max depth: " + rfModel.getMaxDepth)
     rfModel
   }
 
@@ -115,4 +117,8 @@ object ML {
     println("[nbModel] best accuracy: " + m.avgMetrics.max + ", with smoothing para: " + nbModel.getSmoothing)
     nbModel
   }
+
+  def sparseToDense = udf((v: Vector) => v.toDense)
+
+  def denseToSparse = udf((v: Vector) => v.toSparse)
 }
