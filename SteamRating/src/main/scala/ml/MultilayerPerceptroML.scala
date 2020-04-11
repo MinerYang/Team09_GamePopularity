@@ -1,10 +1,10 @@
 package ml
 
-import org.apache.spark.ml.{Pipeline, PipelineModel}
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.ml.classification.{MultilayerPerceptronClassifier, MultilayerPerceptronClassificationModel}
+import org.apache.spark.ml.classification.{MultilayerPerceptronClassificationModel, MultilayerPerceptronClassifier}
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder}
+import org.apache.spark.ml.{Pipeline, PipelineModel}
+import org.apache.spark.sql.SparkSession
 
 case object MultilayerPerceptroML {
   lazy val appName = "SteamDataCleansing"
@@ -32,7 +32,7 @@ case object MultilayerPerceptroML {
 
     val pipeline = new Pipeline().setStages(Array(mlp))
     val paramMap = new ParamGridBuilder()
-      .addGrid(mlp.layers, Array(Array(980,10,5),Array(980,34,5),Array(980,68,5)))
+      .addGrid(mlp.layers, Array(Array(980, 10, 5), Array(980, 34, 5), Array(980, 68, 5)))
       .build()
 
     val crossValidator = new CrossValidator()
@@ -45,7 +45,7 @@ case object MultilayerPerceptroML {
     val m = crossValidator.fit(data)
     val bm = m.bestModel.asInstanceOf[PipelineModel]
     val mlpModel = bm.stages(0).asInstanceOf[MultilayerPerceptronClassificationModel]
-    println("best accuracy: " + m.avgMetrics.max + ", with hidden layer setting: "+ mlpModel.layers(1))
+    println("best accuracy: " + m.avgMetrics.max + ", with hidden layer setting: " + mlpModel.layers(1))
 
     /////////////////////////////////////////////////////////////////
     // train the model
