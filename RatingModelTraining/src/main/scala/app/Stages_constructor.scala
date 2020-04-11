@@ -81,49 +81,31 @@ object Stages_constructor {
     ////    stagesCollector.productIterator.foreach{ i =>println(i.toString)}
 
     //construct estimator
-    /*  5 models*/
-    val lrMl = lr(fsdf)
-    val rfMl = rf(fsdf)
-    val mlpMl = mlp(fsdf)
-    val nbMl = nb(fsdf)
+    /*  4 models*/
+    val ml = {
+      val lrMl = lr(fsdf)
+      val rfMl = rf(fsdf)
+      val mlpMl = mlp(fsdf)
+      val nbMl = nb(fsdf)
+      val candidate = List(lrMl, rfMl, mlpMl, nbMl)
+      val accs = for (m <- candidate) yield{
+        val predictions = m.transform(origindf)
 
-    //TODO: accuray examine???
-//    val predictions = ???.transform(origindf)
-//
-//    //     Select (prediction, true label) and compute test error
-//    val evaluator1 = new MulticlassClassificationEvaluator()
-//      .setLabelCol("label")
-//      .setPredictionCol("prediction")
-//      .setMetricName("accuracy")
-//    val accuracy = evaluator1.evaluate(predictions)
-//    println(s"Test set accuracy = $accuracy")
-//
-//    val evaluator2 = new MulticlassClassificationEvaluator()
-//      .setLabelCol("label")
-//      .setPredictionCol("prediction")
-//      .setMetricName("f1")
-//    val f1 = evaluator2.evaluate(predictions)
-//    println(s"Test set f1 = $f1")
-//
-//    val evaluator3 = new MulticlassClassificationEvaluator()
-//      .setLabelCol("label")
-//      .setPredictionCol("prediction")
-//      .setMetricName("weightedPrecision")
-//    val weightedPrecision = evaluator3.evaluate(predictions)
-//    println(s"Test set weightedPrecision = $weightedPrecision")
-//
-//    val evaluator4 = new MulticlassClassificationEvaluator()
-//      .setLabelCol("label")
-//      .setPredictionCol("prediction")
-//      .setMetricName("weightedRecall")
-//    val weightedRecall = evaluator4.evaluate(predictions)
-//    println(s"Test set weightedRecall = $weightedRecall")
-
-
-    
+        //     Select (prediction, true label) and compute test error
+        val evaluator = new MulticlassClassificationEvaluator()
+          .setLabelCol("label")
+          .setPredictionCol("prediction")
+          .setMetricName("accuracy")
+        val accuracy = evaluator.evaluate(predictions)
+        println(s"Test set accuracy = $accuracy")
+        accuracy
+      }
+      val selected:Int = accs.zipWithIndex.maxBy(_._1)._2
+      candidate(selected)
+    }
 
     // construct stages with transformers ,estimator
-    val stages = Array(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, fs, lrMl, rfMl, mlpMl, nbMl)
+    val stages = Array(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, fs, ml)
 
     //construct pipeline
     val pipeline = new Pipeline()
@@ -133,14 +115,11 @@ object Stages_constructor {
     //    val Array(pltrainingSet, pltestSet) = origindf.randomSplit(Array[Double](0.7, 0.3), 7777L)
     val pipelineModel = pipeline.fit(origindf)
 
-
-
     /**
      * save model locally
      */
-    var exportpath = s"/Users/mineryang/Documents/Team09_GamePopularity-JiaaoYu-working/RatingModelTraining/selected_model"
+    val exportpath = s"/Users/mineryang/Documents/Team09_GamePopularity-JiaaoYu-working/RatingModelTraining/selected_model"
     pipelineModel.write.overwrite().save(exportpath)
-
   }
 
 
