@@ -1,4 +1,4 @@
-package data
+package app
 
 import org.apache.spark.ml.linalg.Vectors
 import org.apache.spark.sql.functions.{split, udf, when}

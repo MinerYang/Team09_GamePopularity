@@ -1,4 +1,4 @@
-package data
+package app
 
 import org.apache.spark.ml.feature.{ChiSqSelector, ChiSqSelectorModel, CountVectorizer, CountVectorizerModel, MinMaxScaler, MinMaxScalerModel}
 import org.apache.spark.sql.DataFrame

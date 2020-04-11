@@ -1,6 +1,6 @@
-package data
+package app
 
-import data.PL_data._
+import app.PL_data._
 import org.apache.spark.ml.PipelineModel
 import org.apache.spark.sql.functions.{split, when}
 import org.apache.spark.sql.{DataFrame, SparkSession}
