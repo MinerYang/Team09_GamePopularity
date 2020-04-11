@@ -4,7 +4,7 @@ import org.apache.spark.ml.classification._
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder}
 import org.apache.spark.ml.{Pipeline, PipelineModel}
-import org.apache.spark.sql.{_}
+import org.apache.spark.sql._
 
 object ML {
   def lr(data: DataFrame): LogisticRegressionModel = {
@@ -134,6 +134,4 @@ object ML {
     println("[nbModel] best accuracy: " + m.avgMetrics.max + ", with smoothing para: " + nbModel.getSmoothing)
     nbModel
   }
-
-
 }
