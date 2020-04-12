@@ -28,7 +28,7 @@ object NB {
 
     //TODO
     val predictions = nb_model.transform(testSet)
-    predictions.select("ratings","prediction", "probability").show(5)
+    predictions.select("ratings","label","prediction", "probability").show(5)
     val evaluator1 = new MulticlassClassificationEvaluator()
       .setLabelCol("ratings")
       .setPredictionCol("prediction")

@@ -13,7 +13,8 @@ object UserInput_Prediction {
     val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
     ss.sparkContext.setLogLevel("WARN")
     // Load data
-    val loadmodel = PipelineModel.load("hdfs://localhost:9000/CSYE7200TEST/selected_model")
+    val path = "/Users/mineryang/Desktop/Team09_GamePopularity/RatingModelTraining"
+    val loadmodel = PipelineModel.load(s"$path/best_model")
     /**
      * This is to simulate some user input to do realtime predictions
      * developer array[String]
@@ -42,13 +43,11 @@ object UserInput_Prediction {
     testdf.show()
     val df1 = parseData(testdf)
     val df2 = processPrice(df1)
-    df2.show()
-    df2.printSchema()
+
 
     //transform a inputdataframe into a dataframe with features columns
     val prediction = loadmodel.transform(df2)
-    prediction.show()
-
+    prediction.select("prediction","probability")show()
   }
 
   def parseData(df: DataFrame): DataFrame = df

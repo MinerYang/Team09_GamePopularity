@@ -50,7 +50,7 @@ case object DataCleaning {
 
     //save clean dataset
     val path2 = "/Users/mineryang/Desktop/Team09_GamePopularity/RatingModelTraining/cleandata.parquet"
-    df_pre.write.parquet(path2)
+    df_pre.write.option("mergeSchema","true").parquet(path2)
     val parquetFileDF = ss.read.parquet(path2)
     parquetFileDF.show(5)
   }
@@ -93,6 +93,7 @@ case object DataCleaning {
     val rank = df.sqlContext.sql("SELECT appid,name, " +
       "((p + 1.9208) / (p + n) - 1.96 * SQRT((p * n) / (p + n) + 0.9604) / (p + n)) / (1 + 3.8416 / (p + n)) " +
       "AS cilb FROM temp WHERE p + n > 0 ")
+    rank.printSchema()
     //      + "ORDER BY cilb DESC")
     //    rank.show()
 
@@ -102,13 +103,17 @@ case object DataCleaning {
     val percent90: Double = df.sqlContext.sql("SELECT percentile(cilb, 0.90) FROM rank").first().getAs[Double](0)
     val percent95: Double = df.sqlContext.sql("SELECT percentile(cilb, 0.95) FROM rank").first().getAs[Double](0)
     df.createOrReplaceTempView("temp")
-    val dfr = df.sqlContext.sql("SELECT * FROM temp JOIN rank ON temp.appid = rank.appid")
+    df.printSchema()
+//    val dfr = df.sqlContext.sql("SELECT * FROM temp JOIN rank ON temp.appid = rank.appid")
+    //avoid duplicate column with index
+    val dfr = df.join(rank,"appid")
+    dfr.printSchema()
     dfr.withColumn("ratings", when(dfr("cilb") >= percent95, 4.0)
       .when(dfr("cilb") >= percent90, 3.0)
       .when(dfr("cilb") >= percent80, 2.0)
       .when(dfr("cilb") >= percent70, 1.0)
       .otherwise(0.0))
-      .drop("positive_ratings", "negative_ratings", "cilb","appid")
+      .drop("positive_ratings", "negative_ratings", "cilb")
   }
 
 

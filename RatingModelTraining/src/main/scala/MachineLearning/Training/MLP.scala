@@ -20,7 +20,7 @@ object MLP {
     featuredf.printSchema()
     println("featuredData load success")
 
-    val layers = Array[Int](424, 64, 24, 3)
+    val layers = Array[Int](980, 64, 24, 5)
     val mlp = new MultilayerPerceptronClassifier()
       .setLayers(layers)
       .setBlockSize(128)
@@ -33,9 +33,9 @@ object MLP {
 
     //TODO
     val predictions = mlp_model.transform(testSet)
-    predictions.show()
+    predictions.select("ratings","label","prediction", "probability").show(5)
     val evaluator = new MulticlassClassificationEvaluator()
-      .setLabelCol("indexedLabel")
+      .setLabelCol("label")
       .setPredictionCol("prediction")
       .setMetricName("accuracy")
     val accuracy = evaluator.evaluate(predictions)

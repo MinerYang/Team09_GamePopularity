@@ -22,7 +22,7 @@ object FeatureEngineering {
     origindf.printSchema()
 
     //construct pipeline1 for feature selection
-    val stages1 = Array(indexer, t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12)
+    val stages1 = Array(indexer,t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12)
     val pipeline1 = new Pipeline()
       .setStages(stages1)
     val df1 = pipeline1.fit(origindf).transform(origindf)
@@ -35,7 +35,7 @@ object FeatureEngineering {
     print("Completed : 80 %\n")
 
     //save featued data
-    final_data.write.parquet(s"$path/featuredData.parquet")
+    final_data.write.parquet(s"$path/featuredData1.parquet")
     println("save featured data to loacal featuredData.parquet")
     print("Completed : 100 %\n")
   }

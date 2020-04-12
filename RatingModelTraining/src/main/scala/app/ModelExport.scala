@@ -7,7 +7,7 @@ import org.apache.spark.ml.feature._
 import org.apache.spark.ml.linalg.Vector
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import MachineLearning.PipelineTransfomer._
-import org.apache.spark.ml.classification.LogisticRegression
+import org.apache.spark.ml.classification.{LogisticRegression, NaiveBayes}
 
 
 object ModelExport {
@@ -27,24 +27,31 @@ object ModelExport {
      * printout featuring process for each transfomers
      * nothing to do with pipeline training
      */
-    saveFeatureProcess(origindf,path)
-    print("Completed : 50 %\n")
+//    saveFeatureProcess(origindf,path)
+//    print("Completed : 50 %\n")
     /**
      * choose one of the best training model to export
      */
-      val name="LogisticRegression"
-      val lr = new LogisticRegression()
-        .setMaxIter(20)
+      val name="NB"
+      val nb = new NaiveBayes()
       // construct new pipeline for web use
-      val stages = Array(indexer, t0,t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, fs, lr)
+      val stages = Array(indexer,t0,t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, fs, nb)
       val pipeline = new Pipeline()
         .setStages(stages)
      print("Completed : 70 %\n")
       // start training
       val Array(trainingSet, testSet) = origindf.randomSplit(Array[Double](0.7, 0.3), 500)
-      val pipelineModel = pipeline.fit(origindf)
-      pipelineModel.transform(testSet).show(5)
+      val pipelineModel = pipeline.fit(trainingSet)
       println("model training complete")
+
+    val predictions = pipelineModel.transform(testSet)
+    predictions.select("ratings","label","prediction", "probability").show(5)
+    val evaluator1 = new MulticlassClassificationEvaluator()
+      .setLabelCol("label")
+      .setPredictionCol("prediction")
+      .setMetricName("accuracy")
+    val accuracy = evaluator1.evaluate(predictions)
+    println(s"Test set accuracy = $accuracy")
 
     /**
      * save model locally
