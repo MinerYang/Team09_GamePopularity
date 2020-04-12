@@ -14,7 +14,6 @@ object ML {
       .setMaxIter(20)
     val pipeline = new Pipeline()
       .setStages(Array(lr))
-
     // We use a ParamGridBuilder to construct a grid of parameters to search over.
     // With 3 values for hashingTF.numFeatures and 2 values for lr.regParam,
     // this grid will have 3 x 2 = 6 parameter settings for CrossValidator to choose from.
