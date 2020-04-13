@@ -4,6 +4,8 @@ import org.apache.spark.ml.classification.{LogisticRegression, NaiveBayes}
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
+import scala.reflect.io.File
+
 object NB {
   lazy val appName = "NB"
   lazy val master = "local[*]"
@@ -36,5 +38,6 @@ object NB {
     val accuracy = evaluator1.evaluate(predictions)
     println(s"Test set accuracy = $accuracy")
   }
+
 
 }
