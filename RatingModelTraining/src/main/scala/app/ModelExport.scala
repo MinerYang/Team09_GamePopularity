@@ -34,7 +34,7 @@ object ModelExport {
       option match {
         case "1" => trainModelToExport(origindf, path)
         case "2" => saveFeatureProcess(origindf, path)
-        case "3" => saveToCsv(rawdf, path)
+        case "3" => saveToCsv(rawdf)
         case "0" => sys.exit()
         case _ => println("invalid option, please type again")
       }
@@ -148,13 +148,12 @@ object ModelExport {
   /**
    * save clean test data into csv file for further use
    * @param rawdf
-   * @param path
    */
-  def saveToCsv(rawdf:DataFrame,path:String) = {
+  def saveToCsv(rawdf:DataFrame) = {
     val df0 = processRatings(rawdf)
     val df = selectcolumns(df0)
 //    df.write.format("csv").save(s"$path/testdata1")
-     df.write.mode("overwrite").option("header", "true").csv(s"$path/testdata")
+     df.write.mode("overwrite").option("header", "true").csv(s"/Users/mineryang/Desktop/testdata")
     println("test data exported to local csv file")
     printHint()
   }
