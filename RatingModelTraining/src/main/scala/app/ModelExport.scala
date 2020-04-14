@@ -20,7 +20,7 @@ object ModelExport {
   def main(args: Array[String]): Unit = {
     val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
     ss.sparkContext.setLogLevel("WARN")
-    val path = "/Users/mineryang/Desktop/Team09_GamePopularity/RatingModelTraining"
+    val path = "."
     val origindf = ss.read.parquet(s"$path/cleandata.parquet")
     val rawdf = readcsv(ss)
 
