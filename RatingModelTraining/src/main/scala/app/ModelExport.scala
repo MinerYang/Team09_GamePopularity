@@ -35,6 +35,7 @@ object ModelExport {
         case "1" => trainModelToExport(origindf, path)
         case "2" => saveFeatureProcess(origindf, path)
         case "3" => saveToCsv(rawdf)
+        case "4" => savePipeline(path)
         case "0" => sys.exit()
         case _ => println("invalid option, please type again")
       }
@@ -49,6 +50,7 @@ object ModelExport {
       "1.Training model to Export\n"+
       "2.Save selected features locally\n"+
       "3.Save testdata to csv file locally\n"+
+      "4.Save useable Pipeline locally\n"+
       "0.Process exit")
   }
 
@@ -77,6 +79,25 @@ object ModelExport {
     saveModel(pipelineModel,path)
     println("model export complete")
     printHint()
+  }
+
+
+  /**
+   * save a  NaiveBayes pipeline locally for futher use
+   */
+  def savePipeline(path:String) = {
+    val pipeline = initNBpipeline()
+    val export = s"$path/my_pipeline"
+    pipeline.write.overwrite().save(export)
+    println("This NaiveBayes pipeline has saved for further use")
+    printHint()
+  }
+
+  def initNBpipeline():Pipeline ={
+    val nb = new NaiveBayes()
+    val stages = Array(indexer,t0,t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, fs, nb)
+    val pipeline = new Pipeline().setStages(stages)
+    return pipeline
   }
 
   /**

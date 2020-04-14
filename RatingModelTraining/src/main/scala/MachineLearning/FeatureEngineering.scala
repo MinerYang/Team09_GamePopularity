@@ -35,7 +35,7 @@ object FeatureEngineering {
     print("Completed : 80 %\n")
 
     //save featued data
-    final_data.write.parquet(s"$path/featuredData1.parquet")
+    final_data.write.parquet(s"$path/featuredData.parquet")
     println("save featured data to loacal featuredData.parquet")
     print("Completed : 100 %\n")
   }
