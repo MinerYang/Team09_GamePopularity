@@ -12,7 +12,7 @@ object LR {
   lazy val appName = "LogsiticRegression"
   lazy val master = "local[*]"
   lazy val threshold = 0.05
-  val path = "/Users/mineryang/Desktop/Team09_GamePopularity/RatingModelTraining"
+  val path = "."
 
   def main(args: Array[String]): Unit = {
     val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
@@ -51,7 +51,22 @@ object LR {
     val predictions = lr_model.transform(testSet)
     predictions.select("ratings","label","prediction", "probability").show(5)
     println("LR model accuracy:" + lr_model.summary.accuracy)
-
+    //    val arr = lr_model.summary.precisionByLabel
+    //    var sum = 0.0
+    //    for ( i <- 0 to (arr.length - 1)) {
+    //      sum += arr(i);
+    //    }
+    //    println(sum + "   !!!  " + sum / 5 )
+    val precision = lr_model.summary.weightedPrecision
+    val recall = lr_model.summary.weightedRecall
+    val f1 = lr_model.summary.weightedFMeasure
+    println("LR model precision:" + precision)
+    println("LR model recall:" + recall)
+    println("LR model f1_score:" + f1)
+    //LR model accuracy:0.758606102268521
+    //LR model precision:0.727881489531847
+    //LR model recall:0.758606102268521
+    //LR model f1_score:0.7026606506894217
 
 
   }

@@ -10,7 +10,7 @@ object NB {
   lazy val appName = "NB"
   lazy val master = "local[*]"
   lazy val threshold = 0.05
-  val path = "/Users/mineryang/Desktop/Team09_GamePopularity/RatingModelTraining"
+  val path = "."
 
   def main(args: Array[String]): Unit = {
     val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
@@ -37,6 +37,25 @@ object NB {
       .setMetricName("accuracy")
     val accuracy = evaluator1.evaluate(predictions)
     println(s"Test set accuracy = $accuracy")
+
+    evaluator1.setMetricName("f1")
+    val f1 = evaluator1.evaluate(predictions)
+    println("f1:" + f1)
+    evaluator1.setMetricName("weightedPrecision")
+    val prec = evaluator1.evaluate(predictions)
+    println("precision:"  + prec)
+    evaluator1.setMetricName("weightedRecall")
+    val recall = evaluator1.evaluate(predictions)
+    println("recall:" + recall)
+    evaluator1.setMetricName("accuracy")
+    val ac = evaluator1.evaluate(predictions)
+    println("accuracy:" + ac)
+    //    Test set accuracy = 0.7132038597776964
+    //    f1:0.6481612995952053
+    //    precision:0.6272876230988563
+    //    recall:0.7132038597776963
+    //    accuracy:0.7132038597776964
+
   }
 
 
