@@ -8,6 +8,7 @@ import MachineLearning.PipelineTransfomer._
 import org.apache.spark.ml.classification.{LogisticRegression, NaiveBayes, NaiveBayesModel}
 import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
 import app.DataCleaning._
+import schema.GameSchema
 
 import scala.reflect.io.File
 
@@ -109,7 +110,7 @@ object ModelExport {
     println("This model has saved for further use")
   }
 
-  def evaluation(model: PipelineModel,testdf:DataFrame): Unit ={
+  def evaluation(model: PipelineModel,testdf:DataFrame): Double ={
     val predictions = model.transform(testdf)
     predictions.select("ratings","label","prediction", "probability").show(5)
     val evaluator1 = new MulticlassClassificationEvaluator()
@@ -118,6 +119,7 @@ object ModelExport {
       .setMetricName("accuracy")
     val accuracy = evaluator1.evaluate(predictions)
     println(s"Test set accuracy = $accuracy")
+    return accuracy
   }
 
   /**
@@ -186,28 +188,28 @@ object ModelExport {
   }
 
   def readcsv(ss:SparkSession ):DataFrame = {
-    val schema = new StructType(Array
-    (
-      StructField("appid", DataTypes.IntegerType),
-      StructField("name", DataTypes.StringType),
-      StructField("release_date", DataTypes.DateType),
-      StructField("english", DataTypes.IntegerType),
-      StructField("developer", DataTypes.StringType),
-      StructField("publisher", DataTypes.StringType),
-      StructField("platforms", DataTypes.StringType),
-      StructField("required_age", DataTypes.IntegerType),
-      StructField("categories", DataTypes.StringType),
-      StructField("genres", DataTypes.StringType),
-      StructField("steamspy_tags", DataTypes.StringType),
-      StructField("achievements", DataTypes.IntegerType),
-      StructField("positive_ratings", DataTypes.IntegerType),
-      StructField("negative_ratings", DataTypes.IntegerType),
-      StructField("average_playtime", DataTypes.IntegerType),
-      StructField("median_playtime", DataTypes.IntegerType),
-      StructField("owners", DataTypes.StringType),
-      StructField("price", DataTypes.DoubleType),
-    ))
-    val path1 = "/Users/mineryang/Desktop/Team09_GamePopularity-JiaaoYu-working/SteamRating/steam.csv"
+    val schema = GameSchema.schema
+//    (
+//      StructField("appid", DataTypes.IntegerType),
+//      StructField("name", DataTypes.StringType),
+//      StructField("release_date", DataTypes.DateType),
+//      StructField("english", DataTypes.IntegerType),
+//      StructField("developer", DataTypes.StringType),
+//      StructField("publisher", DataTypes.StringType),
+//      StructField("platforms", DataTypes.StringType),
+//      StructField("required_age", DataTypes.IntegerType),
+//      StructField("categories", DataTypes.StringType),
+//      StructField("genres", DataTypes.StringType),
+//      StructField("steamspy_tags", DataTypes.StringType),
+//      StructField("achievements", DataTypes.IntegerType),
+//      StructField("positive_ratings", DataTypes.IntegerType),
+//      StructField("negative_ratings", DataTypes.IntegerType),
+//      StructField("average_playtime", DataTypes.IntegerType),
+//      StructField("median_playtime", DataTypes.IntegerType),
+//      StructField("owners", DataTypes.StringType),
+//      StructField("price", DataTypes.DoubleType),
+//    ))
+    val path1 = "./src/main/resources/steam.csv"
     val df: DataFrame = ss.read.format("org.apache.spark.csv")
       .option("header", "true")
       .schema(schema)
