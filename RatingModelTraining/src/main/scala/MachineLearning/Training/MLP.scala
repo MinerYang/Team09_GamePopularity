@@ -31,7 +31,7 @@ object MLP {
     val mlp_model = mlp.fit(trainingSet)
     println("model training complete")
 
-    //TODO
+    //evaluation
     val predictions = mlp_model.transform(testSet)
     predictions.select("ratings","label","prediction", "probability").show(5)
     val evaluator = new MulticlassClassificationEvaluator()

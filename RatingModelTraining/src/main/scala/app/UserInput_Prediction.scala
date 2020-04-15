@@ -13,8 +13,9 @@ object UserInput_Prediction {
     val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
     ss.sparkContext.setLogLevel("WARN")
     // Load data
-    val path = "."
+    val path = "./src/test/resources"
     val loadmodel = PipelineModel.load(s"$path/best_model")
+
     /**
      * This is to simulate some user input to do realtime predictions
      * developer array[String]
@@ -24,7 +25,6 @@ object UserInput_Prediction {
      * tags array[String]
      * price double
      */
-
     val dev: String = "Valve"
     val pub: String = "Valve"
     val plt: String = "windows;mac;linux"

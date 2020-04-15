@@ -3,7 +3,7 @@ package MachineLearning.Training
 import org.apache.spark.ml.classification.{LogisticRegression, NaiveBayes}
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.sql.{DataFrame, SparkSession}
-
+import app.ModelExport._
 import scala.reflect.io.File
 
 object NB {
@@ -25,12 +25,17 @@ object NB {
     val nb = new NaiveBayes()
     val Array(trainingSet, testSet) = featuredf.randomSplit(Array[Double](0.7, 0.3), 7777L)
     val nb_model = nb.fit(trainingSet)
-    nb_model.transform(trainingSet).show(5)
+    val output1 = nb_model.transform(trainingSet)
+      .select("appid","label","prediction")
+    //joinAndSave(output1,ss,"usertest")
     println("model training complete")
 
-    //TODO
+    //evaluation
     val predictions = nb_model.transform(testSet)
-    predictions.select("ratings","label","prediction", "probability").show(5)
+    val output2 = predictions
+      .select("appid","developer","publisher","platforms","categories","tags","ratings","label","prediction")
+    output2.show(false)
+    predictions.select("appid","label","prediction").show()
     val evaluator1 = new MulticlassClassificationEvaluator()
       .setLabelCol("ratings")
       .setPredictionCol("prediction")
