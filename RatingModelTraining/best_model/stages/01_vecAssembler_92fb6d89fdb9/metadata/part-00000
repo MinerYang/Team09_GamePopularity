@@ -1,1 +1,0 @@
-{"class":"org.apache.spark.ml.feature.VectorAssembler","timestamp":1586796263231,"sparkVersion":"2.4.5","uid":"vecAssembler_92fb6d89fdb9","paramMap":{"outputCol":"price_vec","inputCols":["price"]},"defaultParamMap":{"handleInvalid":"error","outputCol":"vecAssembler_92fb6d89fdb9__output"}}
