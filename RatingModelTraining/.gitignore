@@ -1,0 +1,32 @@
+# Build and Release Folders
+*/project
+*/target
+*/*.parquet
+
+# Other files and folders
+*.DS_Store
+.DS_Store
+*/metadata/
+*/stages/
+*/*.parquet
+*.crc
+_SUCCESS
+
+# Executables
+*.class
+*.jar
+*.txt
+*.classpath
+
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
+# should NOT be excluded as they contain compiler settings and other important
+# information for Eclipse / Flash Builder.
+*.csv
+*.csv
