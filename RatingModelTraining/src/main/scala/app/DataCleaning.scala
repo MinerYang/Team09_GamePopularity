@@ -35,7 +35,7 @@ case object DataCleaning {
       StructField("owners", DataTypes.StringType),
       StructField("price", DataTypes.DoubleType),
     ))
-    val path1 = "/Users/mineryang/Desktop/Team09_GamePopularity-JiaaoYu-working/SteamRating/steam.csv"
+    val path1 = "./src/main/resources/steam.csv"
     val df: DataFrame = ss.read.format("org.apache.spark.csv")
       .option("header", "true")
       .schema(schema)
@@ -49,7 +49,7 @@ case object DataCleaning {
     df_pre.printSchema()
 
     //save clean dataset
-    val path2 = "/Users/mineryang/Desktop/Team09_GamePopularity/RatingModelTraining/cleandata.parquet"
+    val path2 = "./cleandata.parquet"
     df_pre.write.option("mergeSchema","true").parquet(path2)
     val parquetFileDF = ss.read.parquet(path2)
     parquetFileDF.show(5)

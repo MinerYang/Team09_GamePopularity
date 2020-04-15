@@ -13,7 +13,7 @@ object UserInput_Prediction {
     val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
     ss.sparkContext.setLogLevel("WARN")
     // Load data
-    val path = "/Users/mineryang/Desktop/Team09_GamePopularity/RatingModelTraining"
+    val path = "."
     val loadmodel = PipelineModel.load(s"$path/best_model")
     /**
      * This is to simulate some user input to do realtime predictions

@@ -9,7 +9,7 @@ object MLP {
   lazy val appName = "MLP"
   lazy val master = "local[*]"
   lazy val threshold = 0.05
-  val path = "/Users/mineryang/Desktop/Team09_GamePopularity/RatingModelTraining"
+  val path = "."
 
   def main(args: Array[String]): Unit = {
     val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
@@ -41,5 +41,20 @@ object MLP {
     val accuracy = evaluator.evaluate(predictions)
     println(s"Test set accuracy = $accuracy")
     println(s"Test Error = ${(1.0 - accuracy)}")
+
+    evaluator.setMetricName("f1")
+    val f1 = evaluator.evaluate(predictions)
+    println("f1:" + f1)
+    evaluator.setMetricName("weightedPrecision")
+    val prec = evaluator.evaluate(predictions)
+    println("precision:"  + prec)
+    evaluator.setMetricName("weightedRecall")
+    val recall = evaluator.evaluate(predictions)
+    println("recall:" + recall)
+    //    Test set accuracy = 0.7053418279833374
+    //    Test Error = 0.29465817201666256
+    //    f1:0.6086967399139426
+    //    precision:0.552129604464222
+    //    recall:0.7053418279833374
   }
 }
