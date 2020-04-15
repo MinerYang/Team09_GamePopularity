@@ -9,6 +9,8 @@
 *.class
 *.jar
 *.classpath
+*/metadata/
+*/stages/
 
 ### IntelliJ IDEA ###
 .idea
