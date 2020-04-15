@@ -3,13 +3,13 @@ package app
 import app.ML._
 import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import MachineLearning.PipelineTransfomer._
 import org.apache.spark.ml.classification.{LogisticRegression, NaiveBayes, NaiveBayesModel}
 import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
 import app.DataCleaning._
 import schema.GameSchema
-
+import org.apache.spark.sql.functions._
 import scala.reflect.io.File
 
 
@@ -35,7 +35,7 @@ object ModelExport {
       option match {
         case "1" => trainModelToExport(origindf, path)
         case "2" => saveFeatureProcess(origindf, path)
-        case "3" => saveToCsv(rawdf)
+        case "3" => saveToCsv(rawdf,"testdata")
         case "4" => savePipeline(path)
         case "0" => sys.exit()
         case _ => println("invalid option, please type again")
@@ -73,7 +73,7 @@ object ModelExport {
       .setStages(stages)
     print("Completed : 70 %\n")
     // start training
-    val Array(trainingSet, testSet) = df.randomSplit(Array[Double](0.7, 0.3), 500)
+    val Array(trainingSet, testSet) = df.randomSplit(Array[Double](0.7, 0.3), 7777L)
     val pipelineModel = pipeline.fit(trainingSet)
     println("model training complete")
     evaluation(pipelineModel,testSet)
@@ -172,14 +172,28 @@ object ModelExport {
    * save clean test data into csv file for further use
    * @param rawdf
    */
-  def saveToCsv(rawdf:DataFrame) = {
+  def saveToCsv(rawdf:DataFrame, filename:String) = {
     val df0 = processRatings(rawdf)
     val df = selectcolumns(df0)
 //    df.write.format("csv").save(s"$path/testdata1")
-     df.write.mode("overwrite").option("header", "true").csv(s"/Users/mineryang/Desktop/testdata")
+     df.write.mode("overwrite").option("header", "true").csv(s"/Users/mineryang/Desktop/$filename")
     println("test data exported to local csv file")
     printHint()
   }
+
+  def joinAndSave(df:DataFrame,ss:SparkSession,filename:String) = {
+    val rawdf = readcsv(ss)
+    val sdf = rawdf.select("appid","developer","publisher","platforms","categories","steamspy_tags")
+    val dfr = df.join(sdf, "appid")
+    dfr.write.mode("overwrite").option("header", "true").csv(s"/Users/mineryang/Desktop/$filename")
+  }
+
+  val stringfy = udf((vs: Seq[String]) => vs match {
+    case null => null
+    case _    => s"""[${vs.mkString(",")}]"""
+  })
+
+  val stringfy2 = udf((vs: Double) => String.valueOf(vs))
 
   def selectcolumns(df:DataFrame):DataFrame = {
     df.select("appid","developer","publisher","platforms","categories","steamspy_tags","price","ratings")
@@ -189,26 +203,6 @@ object ModelExport {
 
   def readcsv(ss:SparkSession ):DataFrame = {
     val schema = GameSchema.schema
-//    (
-//      StructField("appid", DataTypes.IntegerType),
-//      StructField("name", DataTypes.StringType),
-//      StructField("release_date", DataTypes.DateType),
-//      StructField("english", DataTypes.IntegerType),
-//      StructField("developer", DataTypes.StringType),
-//      StructField("publisher", DataTypes.StringType),
-//      StructField("platforms", DataTypes.StringType),
-//      StructField("required_age", DataTypes.IntegerType),
-//      StructField("categories", DataTypes.StringType),
-//      StructField("genres", DataTypes.StringType),
-//      StructField("steamspy_tags", DataTypes.StringType),
-//      StructField("achievements", DataTypes.IntegerType),
-//      StructField("positive_ratings", DataTypes.IntegerType),
-//      StructField("negative_ratings", DataTypes.IntegerType),
-//      StructField("average_playtime", DataTypes.IntegerType),
-//      StructField("median_playtime", DataTypes.IntegerType),
-//      StructField("owners", DataTypes.StringType),
-//      StructField("price", DataTypes.DoubleType),
-//    ))
     val path1 = "./src/main/resources/steam.csv"
     val df: DataFrame = ss.read.format("org.apache.spark.csv")
       .option("header", "true")

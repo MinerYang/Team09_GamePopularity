@@ -47,7 +47,7 @@ object LR {
 //    val lr_model = lr.fit(trainingSet)
     println("model training complete")
 
-    //TODO
+    //evaluation
     val predictions = lr_model.transform(testSet)
     predictions.select("ratings","label","prediction", "probability").show(5)
     println("LR model accuracy:" + lr_model.summary.accuracy)

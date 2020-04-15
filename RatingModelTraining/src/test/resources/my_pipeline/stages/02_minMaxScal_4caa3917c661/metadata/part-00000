@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.MinMaxScaler","timestamp":1586969229823,"sparkVersion":"2.4.5","uid":"minMaxScal_4caa3917c661","paramMap":{"outputCol":"price_vec_features","inputCol":"price_vec"},"defaultParamMap":{"outputCol":"minMaxScal_4caa3917c661__output","min":0.0,"max":1.0}}

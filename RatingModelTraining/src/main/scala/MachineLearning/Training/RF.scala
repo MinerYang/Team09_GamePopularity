@@ -38,7 +38,7 @@ object RF {
     val rf_model = rf.fit(trainingSet)
     println("model training complete")
 
-    //TODO
+    //evaluation
     val predictions = rf_model.transform(testSet)
     predictions.select("ratings","label","prediction", "probability").show(5)
     predictions.printSchema()
