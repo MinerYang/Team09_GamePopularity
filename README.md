@@ -5,9 +5,9 @@
 - Runjie Li
 
 > ## Description
-In order to usefully apply knowledge of Scala and Big data to a problem with practical significance, basically we plan to develop a reactive prediction system about new-released game popularity to help people(including new players, game companies etc.) to predict whether this game would popular or not as well as how popular it would be.
-- Client can get a prediction result including score(1-5) and popularity levels. 
-- Adminstrator is in charge of system updating(model refreshing).
+In order to usefully apply knowledge of Scala and Big data to a problem with practical significance, basically we plan to develop a reactive prediction system about new-released game popularity to help people, including new players, game companies etc.to predict how popular it would be based on poplarity levels.
+- Client: get a prediction result including score(1-5) and popularity levels. 
+- Adminstrator: in charge of system updating(model refreshing).
 - popularrity levels
   - **Overhwelmingly Positive**: (95%-99%) 5 stars
   - **Very Positive**: (90%-95%) 4 stars
@@ -25,6 +25,10 @@ In order to usefully apply knowledge of Scala and Big data to a problem with pra
   - Main job: Data Cleaning, FeatureEngineering, PipelineBuild, ModelTraing, Unit test, Simple user test
   - tools: scala, spark
   - required doccuments: steam.csv
+  ### run model Training app
+  ```
+  run on any IDE with scala and spark configuration 
+  ```
 
 > ## Back End
   - Source: /RatingServer2.0
