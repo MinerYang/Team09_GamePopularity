@@ -4,9 +4,9 @@
 - Miner Yang
 - Runjie Li
 
-```
+
 > ## Description
-In order to usefully apply knowledge of Scala and Big data to a problem with practical significance, basically we plan to develop a reactive prediction system about new-released game popularity to help people, including new players, game companies etc.to predict how popular it would be based on poplarity levels.
+_In order to usefully apply knowledge of Scala and Big data to a problem with practical significance, basically we plan to develop a reactive prediction system about new-released game popularity to help people, including new players, game companies etc.to predict how popular it would be based on poplarity levels._
 - Client: get a prediction result including score(1-5) and popularity levels. 
 - Adminstrator: in charge of system updating(model refreshing).
 - popularrity levels
@@ -15,7 +15,7 @@ In order to usefully apply knowledge of Scala and Big data to a problem with pra
   - **Positive**: (80%-90%) 3 stars
   - **Mostly Positive**: (70%-80%) 2 stars
   - **Negtive**: (0%-70%) 1 stars
-```
+<p>&nbsp;</p>
 
 > ## Dataset
 -	Source https://www.kaggle.com/nikdavis/steam-store-games
