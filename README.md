@@ -20,6 +20,7 @@ _In order to usefully apply knowledge of Scala and Big data to a problem with pr
 > ## Dataset
 -	Source https://www.kaggle.com/nikdavis/steam-store-games
 -	contains 27050 records about games information on steam platform
+<p>&nbsp;</p>
 
 > ## Model Training
   - Source: /RatingModelTraing
@@ -30,6 +31,7 @@ _In order to usefully apply knowledge of Scala and Big data to a problem with pr
   ```
   run on any IDE with scala and spark configuration 
   ```
+<p>&nbsp;</p>
 
 > ## Back End
   - Source: /RatingServer2.0
@@ -45,7 +47,7 @@ _In order to usefully apply knowledge of Scala and Big data to a problem with pr
   curl http://localhost:5000/predict 
   curl http://localhost:5000/train
   ```
-  
+<p>&nbsp;</p>
   
 > ## Front End
   - Source: /RatingWebsite2.0
@@ -57,6 +59,7 @@ _In order to usefully apply knowledge of Scala and Big data to a problem with pr
   python3 -m http.server --bind localhost 8080
   open  http://localhost:8080
   ```
+<p>&nbsp;</p>
 
 
 
