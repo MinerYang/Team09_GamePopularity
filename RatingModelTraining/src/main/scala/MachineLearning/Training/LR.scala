@@ -12,7 +12,7 @@ object LR {
   lazy val appName = "LogsiticRegression"
   lazy val master = "local[*]"
   lazy val threshold = 0.05
-  val path = "."
+  val path = "/Users/mineryang/Desktop/project_metadata"
 
   def main(args: Array[String]): Unit = {
     val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()

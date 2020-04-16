@@ -16,27 +16,7 @@ case object DataCleaning {
     ss.sparkContext.setLogLevel("WARN")
 
     val schema = GameSchema.schema
-//    (
-//      StructField("appid", DataTypes.IntegerType),
-//      StructField("name", DataTypes.StringType),
-//      StructField("release_date", DataTypes.DateType),
-//      StructField("english", DataTypes.IntegerType),
-//      StructField("developer", DataTypes.StringType),
-//      StructField("publisher", DataTypes.StringType),
-//      StructField("platforms", DataTypes.StringType),
-//      StructField("required_age", DataTypes.IntegerType),
-//      StructField("categories", DataTypes.StringType),
-//      StructField("genres", DataTypes.StringType),
-//      StructField("steamspy_tags", DataTypes.StringType),
-//      StructField("achievements", DataTypes.IntegerType),
-//      StructField("positive_ratings", DataTypes.IntegerType),
-//      StructField("negative_ratings", DataTypes.IntegerType),
-//      StructField("average_playtime", DataTypes.IntegerType),
-//      StructField("median_playtime", DataTypes.IntegerType),
-//      StructField("owners", DataTypes.StringType),
-//      StructField("price", DataTypes.DoubleType),
-//    ))
-    val path1 = "./src/main/resources/steam.csv"
+    val path1 = "/Users/mineryang/Desktop/steam-store-games/steam.csv"
     val df: DataFrame = ss.read.format("org.apache.spark.csv")
       .option("header", "true")
       .schema(schema)
@@ -50,7 +30,7 @@ case object DataCleaning {
     df_pre.printSchema()
 
     //save clean dataset
-    val path2 = "./cleandata.parquet"
+    val path2 = "/Users/mineryang/Desktop/project_metadata/cleandata.parquet"
     df_pre.write.option("mergeSchema","true").parquet(path2)
     val parquetFileDF = ss.read.parquet(path2)
     parquetFileDF.show(5)

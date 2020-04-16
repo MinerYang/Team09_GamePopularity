@@ -132,16 +132,12 @@ export default {
         { name: 'type', align: 'center', label: 'type', field: 'type', sortable: true },
         { name: 'accuracy', label: 'accuracy', field: 'accuracy' },
         { name: 'time', label: 'time', field: 'time' }
-        // { name: 'protein', label: 'Protein (g)', field: 'protein' },
-        // { name: 'sodium', label: 'Sodium (mg)', field: 'sodium' },
-        // { name: 'calcium', label: 'Calcium (%)', field: 'calcium', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
-        // { name: 'iron', label: 'Iron (%)', field: 'iron', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) }
       ],
       tabledata: [
         {
           id: 0,
           type: 'Bernoulli Naive Bayes',
-          accuracy: 0.7018,
+          accuracy: 0.6994,
           time: '2020-4-12 12:3:26'
         }
       ]

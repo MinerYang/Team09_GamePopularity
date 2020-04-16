@@ -8,8 +8,10 @@ import MachineLearning.PipelineTransfomer._
 import org.apache.spark.ml.classification.{LogisticRegression, NaiveBayes, NaiveBayesModel}
 import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
 import app.DataCleaning._
+import org.apache.spark.ml.tuning.ParamGridBuilder
 import schema.GameSchema
 import org.apache.spark.sql.functions._
+
 import scala.reflect.io.File
 
 
@@ -21,7 +23,7 @@ object ModelExport {
   def main(args: Array[String]): Unit = {
     val ss = SparkSession.builder.master(master).appName(appName).getOrCreate()
     ss.sparkContext.setLogLevel("WARN")
-    val path = "."
+    val path = "/Users/mineryang/Desktop/project_metadata"
     val origindf = ss.read.parquet(s"$path/cleandata.parquet")
     val rawdf = readcsv(ss)
 
@@ -65,15 +67,14 @@ object ModelExport {
     /**
      * choose one of the best training model to export
      */
-    val name="NB"
     val nb = new NaiveBayes()
-//  construct new pipeline for web use
+    //construct new pipeline for web use
     val stages = Array(indexer,t0,t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, fs, nb)
     val pipeline = new Pipeline()
       .setStages(stages)
-    print("Completed : 70 %\n")
+    print("Completed : 30 %\n")
     // start training
-    val Array(trainingSet, testSet) = df.randomSplit(Array[Double](0.7, 0.3), 7777L)
+    val Array(trainingSet, testSet) = df.randomSplit(Array[Double](0.6,0.4), 7777L)
     val pipelineModel = pipeline.fit(trainingSet)
     println("model training complete")
     evaluation(pipelineModel,testSet)
@@ -203,7 +204,7 @@ object ModelExport {
 
   def readcsv(ss:SparkSession ):DataFrame = {
     val schema = GameSchema.schema
-    val path1 = "./src/main/resources/steam.csv"
+    val path1 = "/Users/mineryang/Desktop/steam-store-games/steam.csv"
     val df: DataFrame = ss.read.format("org.apache.spark.csv")
       .option("header", "true")
       .schema(schema)
