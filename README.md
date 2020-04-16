@@ -15,6 +15,8 @@ _In order to usefully apply knowledge of Scala and Big data to a problem with pr
   - **Positive**: (80%-90%) 3 stars
   - **Mostly Positive**: (70%-80%) 2 stars
   - **Negtive**: (0%-70%) 1 stars
+- Video: https://youtu.be/7T1Z-EI4PRU
+- Presentaion: https://docs.google.com/presentation/d/1I0_m9uM0iG6S9PMNO0xilSdzMWVaPFJFlovXNQxXB54/edit?usp=sharing
 <p>&nbsp;</p>
 
 > ## Dataset
