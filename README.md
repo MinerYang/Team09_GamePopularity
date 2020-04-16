@@ -5,15 +5,50 @@
 - Runjie Li
 
 > ## Description
-In order to usefully apply knowledge of Scala and Big data to a problem with practical significance, basically we plan to develop a client-based new-release game popularity prediction system. We will Ingest data and extract features from Steam Store Games dataset probably combined with Steam reviews dataset or some other related source data, then train model by using spark MLlib and give predicted results back to client through web page, besides, our model will be refreshed as well as the data being updated. 
+In order to usefully apply knowledge of Scala and Big data to a problem with practical significance, basically we plan to develop a reactive prediction system about new-released game popularity to help people(including new players, game companies etc.) to predict whether this game would popular or not as well as how popular it would be.
+- Client can get a prediction result including score(1-5) and popularity levels. 
+- Adminstrator is in charge of system updating(model refreshing).
+- popularrity levels
+  - **Overhwelmingly Positive**: (95%-99%) 5 stars
+  - **Very Positive**: (90%-95%) 4 stars
+  - **Positive**: (80%-90%) 3 stars
+  - **Mostly Positive**: (70%-80%) 2 stars
+  - **Negtive**: (0%-70%) 1 stars
 
-> ## Goals
-In our prediction system, we expect to predict the popularity of a new-release game for its developer and publisher according to its multiple tags, such as games genres. Popularity would be based on positive ratings, negative ratings and other features. This prediction result would benefit the business operation support system of a game company to evaluate their market better.
 
-> ## Dataset Inspection
+> ## Dataset
 -	Source https://www.kaggle.com/nikdavis/steam-store-games
--	6 separated .csv files with roughly 30000 rows
--	steamspy_tag_data.csv contains 371 columns related to game tags we ‘d like to use
+-	contains 27050 records about games information on steam platform
+
+> ## Model Training
+  - Source: /RatingModelTraing
+  - Main job: Data Cleaning, FeatureEngineering, PipelineBuild, ModelTraing, Unit test, Simple user test
+  - tools: scala, spark
+  - required doccuments: steam.csv
+
+> ## Back End
+  - Source: /RatingServer2.0
+  - Main job: REST web back end, using pipeline to do real-time prediction, real-time model training
+  - tools: spark, Pyspark, python, flask
+  - required doccuments: my_pipeline, best_model, cleandata.parquet
+  ### run the back app
+  ```run on any python notebook 
+  ```
+  ### connection test 
+  ```curl http://localhost:5000/predict 
+  curl http://localhost:5000/train
+  ```
+  
+  
+> ## Front End
+  - Source: /RatingWebsite2.0
+  - Main job: REST web front end, client to get prediction result, adminstrator to manage prediction model
+  - tools: node.js, vue
+  ### run the front app
+  ```cd dist/spa
+  python3 -m http.server --bind localhost 8080
+  open  http://localhost:8080
+  ```
 
 
 
