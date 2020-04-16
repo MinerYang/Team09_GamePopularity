@@ -32,10 +32,12 @@ In order to usefully apply knowledge of Scala and Big data to a problem with pra
   - tools: spark, Pyspark, python, flask
   - required doccuments: my_pipeline, best_model, cleandata.parquet
   ### run the back app
-  ```run on any python notebook 
+  ```
+  run on any python notebook 
   ```
   ### connection test 
-  ```curl http://localhost:5000/predict 
+  ```
+  curl http://localhost:5000/predict 
   curl http://localhost:5000/train
   ```
   
@@ -45,7 +47,8 @@ In order to usefully apply knowledge of Scala and Big data to a problem with pra
   - Main job: REST web front end, client to get prediction result, adminstrator to manage prediction model
   - tools: node.js, vue
   ### run the front app
-  ```cd dist/spa
+  ```
+  cd dist/spa
   python3 -m http.server --bind localhost 8080
   open  http://localhost:8080
   ```
